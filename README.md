@@ -20,8 +20,6 @@ configure:<br>
 
 Developer info:
 <pre>
-with the option --nogl will display a legacy file manager view
-
 # if you need to regenerate the interface the following might be helpful:
 #       thumbnail1.xml can be create with dfeet by calling introspection.
 #	the generated code needs manual tuning e.g. add private message member and closing brace, remove path for imports
