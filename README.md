@@ -13,6 +13,9 @@ By no means that is intended to be complete, or help you to go thru anything mor
 
 Enjoy it, you may improve it, or leave it.
 
+The desktop file contains entries, that make this app a picture viewer.
+If this is not intended remove MimeTypes from res/picnic.desktop.in.
+
 <pre>
 configure:<br>
      allow --with-gles using GL ES 3 e.g. useful on Raspi's
