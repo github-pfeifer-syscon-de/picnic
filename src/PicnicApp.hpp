@@ -24,20 +24,16 @@ class PicnicApp : public Gtk::Application {
 public:
     PicnicApp(int arc, char **argv);
     PicnicApp(const PicnicApp& orig);
-    virtual ~PicnicApp();
+    virtual ~PicnicApp() = default;
 
-    Glib::ustring getFilename();
 
     void on_activate() override;
+    void on_open(const Gio::Application::type_vec_files& files, const Glib::ustring& hint) override;
     void on_startup() override;
 protected:
-    int on_cmd(const Glib::RefPtr<Gio::ApplicationCommandLine> &cmd);
+    void get_or_create_picnic();
 private:
-    //PicnicWindow *m_picnicAppWindow;
-    PicnicListWin *m_picnicListWin;
     PicnicWindow *m_picnicWindow;
-    bool m_show_gtkPictureManager;
-    Glib::ustring m_fileName;
     void on_action_quit();
 };
 

@@ -26,58 +26,68 @@
 
 
 PicnicApp::PicnicApp(int argc, char **argv)
-: Gtk::Application(argc, argv, "de.pfeifer_syscon.picnic", Gio::ApplicationFlags::APPLICATION_HANDLES_COMMAND_LINE )	// , Gio::APPLICATION_HANDLES_COMMAND_LINE kill default handling
-, m_picnicListWin{nullptr}
+: Gtk::Application(argc, argv, "de.pfeifer_syscon.picnic", Gio::ApplicationFlags::APPLICATION_HANDLES_OPEN )	// , Gio::APPLICATION_HANDLES_COMMAND_LINE kill default handling
 , m_picnicWindow{nullptr}
-, m_show_gtkPictureManager{false}
-, m_fileName()
-{
-    signal_command_line().connect(sigc::mem_fun(*this, &PicnicApp::on_cmd), false);
-}
-
-
-PicnicApp::~PicnicApp()
 {
 }
 
+
+void
+PicnicApp::get_or_create_picnic()
+{
+    // The application has been asked to open some files,
+    // so let's open a new view for each one.
+    PicnicWindow* appwindow = nullptr;
+    auto windows = get_windows();
+    if (windows.size() > 0) {
+        appwindow = dynamic_cast<PicnicWindow*>(windows[0]);
+    }
+
+    if (!appwindow) {
+        m_picnicWindow = new PicnicWindow(this);
+        add_window(*m_picnicWindow);
+        m_picnicWindow->show();
+    }
+    else {
+        m_picnicWindow = appwindow;
+    }
+}
 
 void
 PicnicApp::on_activate()
 {
-	if (m_show_gtkPictureManager) {
-		auto builder = Gtk::Builder::create();
-		try {
-			builder->add_from_resource(get_resource_base_path() + "/win.ui");
-			builder->get_widget_derived("IconView", m_picnicListWin, this);
-			add_window(*m_picnicListWin);
-			m_picnicListWin->show();
-		}
-		catch (const Glib::Error &ex) {
-			std::cerr << "Unable to load win.ui: " << ex.what() << std::endl;
-		}
-	}
-	else {
-		m_picnicWindow = new PicnicWindow(this);
-		add_window(*m_picnicWindow);
-		m_picnicWindow->show();
-
-		if (!m_fileName.empty()) {
-			const int32_t front = 0;
-			std::vector<Glib::RefPtr<Gio::File>>  picts;
-			Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(m_fileName);
-			picts.push_back(file);
-
-			ImageView::showView(front, picts, m_picnicWindow->getAppSupport());
-		}
-	}
+    // either on_activate is called (no args)
+    get_or_create_picnic(); // on instance shoud be sufficent
 }
 
+void
+PicnicApp::on_open(const Gio::Application::type_vec_files& files, const Glib::ustring& hint)
+{
+    // or on_open is called (some args)
+    try {
+        get_or_create_picnic();
+
+        if (!files.empty()) {
+            std::vector<Glib::RefPtr<Gio::File>>  picts;
+            for (auto file : files) {
+                picts.push_back(file);
+            }
+            const int32_t front = 0;
+            // this opens a single dialog with paging ...
+            ImageView::showView(front, picts, m_picnicWindow->getAppSupport());
+        }
+    }
+    catch (const Glib::Error& ex) {
+        std::cerr << "PicnicApp::on_open(): " << ex.what() << std::endl;
+    }
+    catch (const std::exception& ex) {
+        std::cerr << "PicnicApp::on_open(): " << ex.what() << std::endl;
+    }
+}
 
 void
 PicnicApp::on_action_quit()
 {
-	if (m_picnicListWin) 
-		m_picnicListWin->hide();	
 	if (m_picnicWindow)
 		m_picnicWindow->hide();
 
@@ -85,38 +95,6 @@ PicnicApp::on_action_quit()
     // Gio::Application::hold() has been called without a corresponding call
     // to Gio::Application::release().
     quit();
-}
-
-Glib::ustring
-PicnicApp::getFilename()
-{
-	return m_fileName;
-}
-
-
-int
-PicnicApp::on_cmd(const Glib::RefPtr<Gio::ApplicationCommandLine> &cmd) {
-	Glib::OptionContext ctx;
-	Glib::OptionGroup group("options", "main options");
-	Glib::OptionEntry entry;
-	entry.set_long_name("nogl");
-	entry.set_description("show gtk-interface.");
-	group.add_entry(entry, m_show_gtkPictureManager);
-	ctx.add_group(group);
-	// add GTK options, --help-gtk, etc
-	Glib::OptionGroup gtkgroup(gtk_get_option_group(true));
-	ctx.add_group(gtkgroup);
-	int argc;
-	char **argv = cmd->get_arguments(argc);
-	ctx.parse(argc, argv);
-	if (argc > 1) {
-		char *fileName = argv[1];
-		if (fileName != nullptr) {
-			m_fileName = Glib::ustring(fileName);
-		}
-	}
-	activate();
-    return 0;
 }
 
 void
