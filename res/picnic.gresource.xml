@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/de/pfeifer_syscon/picnic">
+    <file preprocess="xml-stripblanks">win.ui</file>
+    <file preprocess="xml-stripblanks">app-menu.ui</file>
+    <file preprocess="xml-stripblanks">view.ui</file>
+    <file preprocess="xml-stripblanks">abt-dlg.ui</file>
+    <file>picnic.png</file>
+  </gresource>
+</gresources>
