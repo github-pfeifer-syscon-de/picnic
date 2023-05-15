@@ -30,6 +30,15 @@ PKG_CHECK_MODULES(OPENSSL, [openssl])
 
 PKG_CHECK_MODULES(LIBEXIF, [libexif])
 
+AC_ARG_WITH([gles], AS_HELP_STRING([--with-gles], [use openGL ES 3 (Raspi) otherweise fullgl]))
+
+if test "x$with_gles" = "xyes" ; then
+    PKG_CHECK_MODULES(EPOXY,[glesv2], [AC_DEFINE([USE_GLES], [1], [Using openGL ES 3])])
+
+else
+    PKG_CHECK_MODULES(EPOXY,[epoxy])
+fi
+
 AX_CHECK_SED()
 
 AC_CONFIG_FILES([
