@@ -102,6 +102,7 @@ ImageArea::calculateView()
                 height = view->get_allocated_height();
                 break;
             case ViewMode::NATIVE:
+            default:
                 width = m_displayImage->get_width();
                 height = m_displayImage->get_height();
                 break;
