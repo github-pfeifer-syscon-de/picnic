@@ -7,7 +7,7 @@ Allows cropping a image, and saving in formats supported by Gdk/Gtk.
 
 ![PicnicWin](picview.png "picnic view window")
 
-Build with autotools, requires genericGlm (see there for some basic build infos).
+Build with autotools, requires genericGlm and genericImg (see there for some basic build infos).
 
 By no means that is intended to be complete, or help you to go thru anything more than a hundred pictures.
 

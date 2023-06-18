@@ -23,8 +23,8 @@
 #include <map>
 #include <list>
 #include <future>
+#include <ConcurrentCollections.hpp>
 
-#include "ConcurrentCollections.hpp"
 #include "Worker.hpp"
 #include "thumbnail1_proxy.h"
 #include "Pict.hpp"

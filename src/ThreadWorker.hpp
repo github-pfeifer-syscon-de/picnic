@@ -20,8 +20,8 @@
 #pragma once
 
 #include <glibmm.h>
+#include <ConcurrentCollections.hpp>
 
-#include "ConcurrentCollections.hpp"
 #include "Worker.hpp"
 
 

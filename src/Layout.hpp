@@ -18,8 +18,7 @@
 #pragma once
 
 #include <gtkmm.h>
-
-#include "ConcurrentCollections.hpp"
+#include <ConcurrentCollections.hpp>
 
 class Tile;
 class NaviGlArea;

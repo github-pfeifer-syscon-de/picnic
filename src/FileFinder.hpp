@@ -18,9 +18,10 @@
 #pragma once
 
 #include <glibmm.h>
+#include <ConcurrentCollections.hpp>
 
 #include "PicnicView.hpp"
-#include "ConcurrentCollections.hpp"
+
 
 class PicnicView;
 
