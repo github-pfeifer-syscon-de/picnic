@@ -20,6 +20,7 @@
 #include <iomanip>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <StringUtils.hpp>
 
 #include "ImageIconList.hpp"
 
@@ -77,7 +78,7 @@ ImageIconList::addRow(Glib::RefPtr<Gio::FileInfo>& fileInfo, Glib::RefPtr<Gio::F
 		row.set_value(m_imageListColumns.m_name, cName);
 		if (cName.length() > 16) {
 			cName = cName.substr(0, 16);
-			cName += u8"…";
+			cName += StringUtils::u8str(u8"…");
 		}
 		row.set_value(m_imageListColumns.m_shortName, cName);
 		auto buf = getIcon(fileInfo);

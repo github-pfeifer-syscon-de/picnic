@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 	$(GLIBMM_CFLAGS) \
 	$(GTHREAD_CFLAGS) \
 	$(GENERICGLM_CFLAGS) \
+	$(GENERICIMG_CFLAGS) \
 	$(EPOXY_CFLAGS) \
 	$(OPENSSL_CFLAGS) \
 	$(LIBEXIF_CFLAGS)
@@ -35,8 +36,6 @@ picnic_SOURCES = \
 	DbusWorker.hpp \
 	ThreadWorker.cpp \
 	ThreadWorker.hpp \
-	ConcurrentCollections.cpp \
-	ConcurrentCollections.hpp \
 	PicnicApp.cpp \
 	PicnicApp.hpp \
 	PicnicWindow.cpp \
@@ -95,6 +94,7 @@ picnic_SOURCES = \
 picnic_LDFLAGS =
 
 picnic_LDADD = $(GENERICGLM_LIBS) \
+	$(GENERICIMG_LIBS) \
 	$(GLIBMM_LIBS) \
 	$(GTKMM_LIBS) \
 	$(GTHREAD_LIBS) \
