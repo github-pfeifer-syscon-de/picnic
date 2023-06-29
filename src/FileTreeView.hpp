@@ -24,7 +24,7 @@
 class FileTreeView : public Gtk::TreeView, public RowReadyNotify {
 public:
     FileTreeView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& builder);
-    virtual ~FileTreeView();
+    virtual ~FileTreeView() = default;
 private:
 
     void notifyRowReady(const Gtk::TreePath& path) override;

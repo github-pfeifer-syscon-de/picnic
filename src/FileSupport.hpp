@@ -21,19 +21,21 @@
 #include <giomm.h>
 #include <list>
 
-class FileModel {
+class FileModel
+{
 public:
-    ~FileModel();
+    ~FileModel() = default;
     virtual void addRow(Glib::RefPtr<Gio::FileInfo>& fileInfo, Glib::RefPtr<Gio::File>& file) = 0;
     virtual const char* getAttributes() = 0;
 protected:
-    FileModel();
+    FileModel() = default;
 };
 
-class FileSupport {
+class FileSupport
+{
 public:
     FileSupport(FileModel& fileModel);
-    virtual ~FileSupport();
+    virtual ~FileSupport() = default;
 
     void load(Glib::RefPtr<Gio::File>& dir);
     void add_file(Glib::RefPtr<Gio::AsyncResult>& result);
@@ -44,7 +46,7 @@ private:
     Glib::RefPtr<Gio::Cancellable> m_cancellable;
     FileModel& m_fileModel;
     std::list<Glib::RefPtr<Gio::File>> m_queue;
-    
+
     static const int FILE_COUNT = 10;    // keep this low in case we load from a slow medium..., 100 has no visible effect on local fs (raspi)
 };
 

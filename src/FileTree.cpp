@@ -40,11 +40,6 @@ FileTree::FileTree(RowReadyNotify& rowReadyNotify)
 {
 }
 
-
-FileTree::~FileTree()
-{
-}
-
 void
 FileTree::setModelRef(Glib::RefPtr<FileTree>& modelRef)
 {
@@ -100,7 +95,7 @@ FileTree::addRow(Glib::RefPtr<Gio::FileInfo>& fileInfo, Glib::RefPtr<Gio::File>&
 	}
 }
 
-Gtk::TreePath 
+Gtk::TreePath
 FileTree::load(Glib::RefPtr<Gio::File>& dir)
 {
 	m_selected = dir;
@@ -149,7 +144,7 @@ FileTree::isDescendant(Glib::RefPtr<Gio::File>& dir)
 }
 
 // add a path by using existing nodes as far as possible
-Gtk::TreePath 
+Gtk::TreePath
 FileTree::addPath(Glib::RefPtr<Gio::File>& dir)
 {
 	Glib::RefPtr<Gio::File> up = dir;

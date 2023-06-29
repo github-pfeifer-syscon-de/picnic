@@ -20,7 +20,6 @@
 #include "ApplicationSupport.hpp"
 #include "ImageIconList.hpp"
 #include "FileTree.hpp"
-#include "Pict.hpp"
 
 #include <memory>
 
@@ -29,8 +28,8 @@ class FileTreeView;
 
 class PicnicListWin : public Gtk::ApplicationWindow {
 public:
-    PicnicListWin(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& builder, PicnicApp *picnicApp);
-    virtual ~PicnicListWin();
+    PicnicListWin(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& builder, Gtk::Application *picnicApp);
+    virtual ~PicnicListWin() = default;
 
     void on_action_open();
     void on_action_view();

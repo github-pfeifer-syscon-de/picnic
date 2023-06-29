@@ -29,11 +29,6 @@ DirNode::DirNode(DirNode *parent, Gtk::TreeRowReference& treeRow, const Glib::Re
 {
 }
 
-
-DirNode::~DirNode()
-{
-}
-
 // this shoud be called for the right parent in tree
 std::shared_ptr<DirNode>
 DirNode::find(Glib::RefPtr<FileTree>& model, const Glib::RefPtr<Gio::File>& fDir)

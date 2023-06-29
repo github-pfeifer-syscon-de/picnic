@@ -26,7 +26,7 @@ class FileTree;
 class DirNode {
 public:
     DirNode(DirNode *parent, Gtk::TreeRowReference& treeRow, const Glib::RefPtr<Gio::File>& file);
-    virtual ~DirNode();
+    virtual ~DirNode() = default;
 
     std::shared_ptr<DirNode> find(Glib::RefPtr<FileTree>& model, const Glib::RefPtr<Gio::File>& fDir);
     void setLoaded(bool loaded);

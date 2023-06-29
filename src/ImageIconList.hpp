@@ -23,7 +23,8 @@
 /*
  * model of image icon display
  */
-class ImageListColumns : public Gtk::TreeModel::ColumnRecord
+class ImageListColumns
+: public Gtk::TreeModel::ColumnRecord
 {
 public:
     Gtk::TreeModelColumn<Glib::ustring> m_name; // referenced by index in PicnicListWin
@@ -39,9 +40,11 @@ public:
     }
 };
 
-class ImageIconList : public Gtk::ListStore, FileModel {
+class ImageIconList
+: public Gtk::ListStore, FileModel
+{
 public:
-    virtual ~ImageIconList();
+    virtual ~ImageIconList() = default;
 
     static Glib::RefPtr<ImageIconList> create();
     static ImageListColumns m_imageListColumns;

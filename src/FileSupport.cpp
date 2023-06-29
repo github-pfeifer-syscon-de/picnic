@@ -19,24 +19,10 @@
 
 #include "FileSupport.hpp"
 
-FileModel::FileModel()
-{
-
-}
-
-FileModel::~FileModel()
-{
-
-}
 
 FileSupport::FileSupport(FileModel &fileModel)
 : m_fileModel(fileModel)
 , m_queue()
-{
-}
-
-
-FileSupport::~FileSupport()
 {
 }
 

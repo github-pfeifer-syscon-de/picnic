@@ -7,4 +7,3 @@ Comment=Fancy image viewer
 Categories=Application;Graphics;
 Exec=picnic %F
 Icon=@APP_ICON@
-MimeType=image/png;image/gif;image/jpeg;image/bmp;image/x-pixmap;image/tiff;image/svg+xml;image/x-xpixmap;

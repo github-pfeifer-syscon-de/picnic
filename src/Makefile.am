@@ -10,8 +10,7 @@ AM_CPPFLAGS = \
 	$(GENERICGLM_CFLAGS) \
 	$(GENERICIMG_CFLAGS) \
 	$(EPOXY_CFLAGS) \
-	$(OPENSSL_CFLAGS) \
-	$(LIBEXIF_CFLAGS)
+	$(OPENSSL_CFLAGS)
 
 
 AM_CFLAGS= \
@@ -39,47 +38,27 @@ picnic_SOURCES = \
 	PicnicApp.cpp \
 	PicnicApp.hpp \
 	PicnicWindow.cpp \
+	PicnicWindow.hpp \
 	PicnicView.hpp \
+	PicnicView.cpp \
 	Pict.cpp \
 	Pict.hpp \
-	PicnicView.cpp \
-	PicnicWindow.hpp \
+	PicnicListWin.cpp \
+	PicnicListWin.hpp \
 	Tile.cpp \
 	Tile.hpp \
 	Layout.cpp \
 	Layout.hpp \
-	ImageArea.cpp \
-	ImageArea.hpp \
-	ImageView.cpp \
-	ImageView.hpp \
-	ImageOptions.cpp \
-	ImageOptions.hpp \
-	ImageOptionDialog.cpp \
-	ImageOptionDialog.hpp \
-	BinModel.cpp \
-	BinModel.hpp \
-	BinView.cpp \
-	BinView.hpp \
-	ApplicationSupport.cpp \
-	ApplicationSupport.hpp \
-	DisplayImage.cpp \
-	DisplayImage.hpp \
-	ExifReader.cpp \
-	ExifReader.hpp \
+	DirNode.cpp \
+	DirNode.hpp \
 	ImageIconList.cpp \
 	ImageIconList.hpp \
+	FileSupport.cpp \
+	FileSupport.hpp \
 	FileTree.cpp \
 	FileTree.hpp \
 	FileTreeView.cpp \
 	FileTreeView.hpp \
-	FileSupport.cpp \
-	FileSupport.hpp \
-	PicnicListWin.cpp \
-	PicnicListWin.hpp \
-	DirNode.cpp \
-	DirNode.hpp \
-	ImageList.cpp \
-	ImageList.hpp \
 	RectLayout.cpp \
 	RectLayout.hpp \
 	RollLayout.cpp \
@@ -99,8 +78,7 @@ picnic_LDADD = $(GENERICGLM_LIBS) \
 	$(GTKMM_LIBS) \
 	$(GTHREAD_LIBS) \
 	$(EPOXY_LIBS) \
-	$(OPENSSL_LIBS) \
-	$(LIBEXIF_LIBS)
+	$(OPENSSL_LIBS)
 
 
 # Remove ui directory on uninstall

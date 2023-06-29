@@ -33,10 +33,6 @@ ImageIconList::ImageIconList()
 {
 }
 
-ImageIconList::~ImageIconList()
-{
-}
-
 Glib::RefPtr<ImageIconList>
 ImageIconList::create()
 {

@@ -23,10 +23,8 @@
 
 #include "PicnicListWin.hpp"
 #include "FileTree.hpp"
-#include "PicnicApp.hpp"
 #include "ImageView.hpp"
 #include "FileTreeView.hpp"
-#include "PicnicWindow.hpp"
 
 const char* PicnicListWin::CONF_GROUP = "picnic";
 const char* PicnicListWin::CONF_PREFIX = "win";
@@ -35,7 +33,7 @@ const char* PicnicListWin::DIV = "div";
 
 PicnicListWin::PicnicListWin(
     BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& builder,
-	PicnicApp *picnicApp)
+	Gtk::Application *picnicApp)
 : Gtk::ApplicationWindow(cobject)
 , m_fileTreeView{nullptr}
 , m_appSupport{"picnic.conf"}
@@ -97,10 +95,6 @@ PicnicListWin::PicnicListWin(
 	showDir(fDir);
 }
 
-
-PicnicListWin::~PicnicListWin()
-{
-}
 
 void
 PicnicListWin::showDir(Glib::RefPtr<Gio::File>& fDir)
@@ -189,7 +183,7 @@ PicnicListWin::on_action_view()
 	}
 	else {
 		// use first seems most reasonable
-		path = m_listStore->get_path(m_listStore->children().begin());	
+		path = m_listStore->get_path(m_listStore->children().begin());
 	}
 
 	on_activated(path);

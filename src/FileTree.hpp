@@ -51,7 +51,7 @@ public:
 
 class FileTree : public Gtk::TreeStore, FileModel {
 public:
-    virtual ~FileTree();
+    virtual ~FileTree() = default;
 
     static Glib::RefPtr<FileTree> create(RowReadyNotify& rowReadyNotify);
     static TreeColumns m_treeColumns;

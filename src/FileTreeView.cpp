@@ -27,12 +27,6 @@ FileTreeView::FileTreeView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Buil
 
 }
 
-FileTreeView::~FileTreeView()
-{
-}
-
-
-
 void
 FileTreeView::onTreeRowExpanded(const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path)
 {
