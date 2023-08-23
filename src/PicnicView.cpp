@@ -242,7 +242,7 @@ PicnicView::add_file(const std::string& mime, Glib::RefPtr<Gio::FileInfo>& fileI
 }
 
 void
-PicnicView::loadDispatcherEmit() 
+PicnicView::loadDispatcherEmit()
 {
     m_glArea->make_current();	// this is a game changer!!!
 	while (true) {
@@ -423,5 +423,5 @@ PicnicView::on_action_view()
         Pict * pict = (Pict *)*i;
         picts.push_back(pict->getPath());
     }
-	ImageView::showView(front, picts, m_appSupport);
+	ImageView<Gtk::Window,GtkWindow>::showView(front, picts, m_appSupport);
 }

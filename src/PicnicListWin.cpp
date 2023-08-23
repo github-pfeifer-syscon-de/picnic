@@ -154,7 +154,7 @@ PicnicListWin::on_activated(const Gtk::TreeModel::Path& path)
 	for (Glib::RefPtr<Gio::File> f : files) {
 		auto info = f->query_info(cancellable, "standard::*");
 		auto mime = info->get_content_type();	// use also extended type
-		if (ImageView::is_mime_gdk_readable(mime)) {
+		if (ImageView<Gtk::Window,GtkWindow>::is_mime_gdk_readable(mime)) {
 			if (selectedFile && selectedFile == f) {
 				front = picts.size();
 			}
@@ -162,7 +162,7 @@ PicnicListWin::on_activated(const Gtk::TreeModel::Path& path)
 		}
 	}
 	if (!picts.empty()) {
-		ImageView::showView(front, picts, m_appSupport);
+		ImageView<Gtk::Window,GtkWindow>::showView(front, picts, m_appSupport);
 	}
 	else {
 		m_appSupport.showError("No displayable images", Gtk::MessageType::MESSAGE_INFO);

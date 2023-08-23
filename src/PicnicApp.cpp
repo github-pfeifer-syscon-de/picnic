@@ -74,7 +74,7 @@ PicnicApp::on_open(const Gio::Application::type_vec_files& files, const Glib::us
             }
             const int32_t front = 0;
             // this opens a single dialog with paging ...
-            ImageView::showView(front, picts, m_picnicWindow->getAppSupport());
+            ImageView<Gtk::Window,GtkWindow>::showView(front, picts, m_picnicWindow->getAppSupport());
         }
     }
     catch (const Glib::Error& ex) {

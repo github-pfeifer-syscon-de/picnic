@@ -66,3 +66,6 @@
 /src/Makefile
 /src/.deps/thumbnail1_common.Tpo
 /src/.deps/ImageIconList.Tpo
+/src/.deps/PicnicView.Tpo
+/src/.deps/PicnicListWin.Tpo
+/src/.deps/PicnicApp.Tpo
