@@ -26,7 +26,7 @@
 
 RollLayout::RollLayout(NaviGlArea *glArea)
 : Layout(glArea)
-, m_front(0)
+, m_front{0}
 {
 }
 

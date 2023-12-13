@@ -21,8 +21,8 @@
 
 RectLayout::RectLayout(NaviGlArea *glArea)
 : Layout(glArea)
-, m_last(nullptr)
-, m_front(0u)
+, m_last{nullptr}
+, m_front{0u}
 {
 }
 

@@ -21,7 +21,7 @@
 
 
 FileSupport::FileSupport(FileModel &fileModel)
-: m_fileModel(fileModel)
+: m_fileModel{fileModel}
 , m_queue()
 {
 }

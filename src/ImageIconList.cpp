@@ -29,7 +29,7 @@ ImageListColumns ImageIconList::m_imageListColumns;
 
 ImageIconList::ImageIconList()
 : Gtk::ListStore(m_imageListColumns)
-, m_fileSupport(*this)
+, m_fileSupport{*this}
 {
 }
 

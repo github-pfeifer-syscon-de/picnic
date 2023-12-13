@@ -35,8 +35,8 @@ RowReadyNotify::~RowReadyNotify()
 
 FileTree::FileTree(RowReadyNotify& rowReadyNotify)
 : Gtk::TreeStore(m_treeColumns)
-, m_fileSupport(*this)
-, m_rowReadyNotify(rowReadyNotify)
+, m_fileSupport{*this}
+, m_rowReadyNotify{rowReadyNotify}
 {
 }
 

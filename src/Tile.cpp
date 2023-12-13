@@ -40,15 +40,15 @@ class CompareByName  {
 
 Tile::Tile(GLenum type, GeometryContext *_ctx)
 : Geometry(type, _ctx)
-, m_toScale(1.0f)
-, m_aktScale(1.0f)
-, m_baseScale(1.0f)
+, m_toScale{1.0f}
+, m_aktScale{1.0f}
+, m_baseScale{1.0f}
 , m_startRotate()
 , m_toRotate()
-, m_animation(Animation::NONE)
-, m_started(LLONG_MIN)
-, m_text(nullptr)
-, m_textVisible(TRUE)
+, m_animation{Animation::NONE}
+, m_started{LLONG_MIN}
+, m_text{nullptr}
+, m_textVisible{true}
 {
 }
 

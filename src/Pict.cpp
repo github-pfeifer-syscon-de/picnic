@@ -24,12 +24,12 @@
 
 Pict::Pict(const Glib::RefPtr<Gio::File> path, const Glib::ustring &name, const std::string mime, TextContext *pictContext)
 : Tile(GL_TRIANGLES, pictContext)
-, m_path(path)
-, m_name(name)
-, m_mime(mime)
-, m_tex(nullptr)
+, m_path{path}
+, m_name{name}
+, m_mime{mime}
+, m_tex{nullptr}
 , m_pix()
-, m_state(State::CREATED)
+, m_state{State::CREATED}
 {
 }
 

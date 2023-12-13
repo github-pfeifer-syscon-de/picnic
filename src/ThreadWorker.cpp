@@ -23,7 +23,7 @@
 
 ThreadWorker::ThreadWorker(Glib::Dispatcher &_Dispatcher, Glib::Dispatcher &_readyDispatcher)
 : Worker(_Dispatcher, _readyDispatcher)
-, m_workerThread(nullptr)
+, m_workerThread{nullptr}
 , m_files()
 {
     m_readyDispatcher.emit();   // here we wont need a special setup

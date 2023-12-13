@@ -22,8 +22,8 @@
 #include "ThreadWorker.hpp"
 
 Worker::Worker(Glib::Dispatcher &_Dispatcher, Glib::Dispatcher & _readyDispatcher)
-: m_Dispatcher(_Dispatcher)
-, m_readyDispatcher(_readyDispatcher)
+: m_Dispatcher{_Dispatcher}
+, m_readyDispatcher{_readyDispatcher}
 {
 }
 
