@@ -172,7 +172,7 @@ PicnicView::init(Gtk::GLArea *glArea)
     m_font = new Font("sans-serif");    //
     // this solves our text garbling, but by increasing startup time
     if (textContext) {
-        m_font->createDefault(textContext);
+        m_font->createDefault(textContext, GL_TRIANGLES);
     }
     m_layout = new RollLayout(m_glArea);
     m_gray = new Gray();

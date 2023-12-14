@@ -181,7 +181,7 @@ Tile::displayText(Matrix &projView, MarkContext *textContext, Font *font, Layout
         m_text->setVisible(m_textVisible);
     }
     m_text->setPosition(pos);
-    m_text->setScale(m_scale * 0.0015f);      // Quads 0.05f triangles 0.0015f
+    m_text->setScale(m_scale * 0.0012f);      // Quads 0.05f triangles 0.0012f
     m_text->display(projView);
 }
 

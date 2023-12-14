@@ -20,7 +20,7 @@ PKG_CHECK_MODULES([EPOXY], [epoxy])
 
 PKG_CHECK_MODULES(GTHREAD, [gthread-2.0])
 
-PKG_CHECK_MODULES([GENERICGLM], [genericglm >= 0.2.4])
+PKG_CHECK_MODULES([GENERICGLM], [genericglm >= 0.2.5])
 
 PKG_CHECK_MODULES([GENERICIMG], [genericimg >= 0.2.0])
 
