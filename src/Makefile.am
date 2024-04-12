@@ -4,8 +4,6 @@ AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)."\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
-	$(GTKMM_CFLAGS) \
-	$(GLIBMM_CFLAGS) \
 	$(GTHREAD_CFLAGS) \
 	$(GENERICGLM_CFLAGS) \
 	$(GENERICIMG_CFLAGS) \
@@ -74,8 +72,6 @@ picnic_LDFLAGS =
 
 picnic_LDADD = $(GENERICGLM_LIBS) \
 	$(GENERICIMG_LIBS) \
-	$(GLIBMM_LIBS) \
-	$(GTKMM_LIBS) \
 	$(GTHREAD_LIBS) \
 	$(EPOXY_LIBS) \
 	$(OPENSSL_LIBS)
