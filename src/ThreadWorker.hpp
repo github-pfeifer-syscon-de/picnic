@@ -24,7 +24,6 @@
 
 #include "Worker.hpp"
 
-
 class Pict;
 
 class ThreadWorker : public Worker
@@ -33,12 +32,12 @@ public:
     ThreadWorker(Glib::Dispatcher &_Dispatcher, Glib::Dispatcher &_readyDispatcher);
     virtual ~ThreadWorker();
 
-    void queue(Pict * pict) override;
+    void queue(const psc::mem::active_ptr<Pict>& pict) override;
     bool isMimeSupported(const std::string mime) override;
 protected:
-    void loadScaled(Pict* pict);
+    void loadScaled(const psc::mem::active_ptr<Pict>& pict);
     void work();
 private:
     std::thread *m_workerThread;
-    TQueueConcurrent<Pict *> m_files;
+    TQueueConcurrent<psc::mem::active_ptr<Pict>> m_files;
 };

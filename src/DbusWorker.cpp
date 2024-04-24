@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <fstream>
 #include <stdlib.h>
+#include <Log.hpp>
 
 #include "DbusWorker.hpp"
 #include "Pict.hpp"
@@ -162,20 +163,22 @@ DbusWorker::queue()
         std::vector<Glib::ustring> mimes;
         std::lock_guard<std::mutex> lock(m_MutexBus);
         while (!m_pictsQueue.empty()) {
-            Pict *pict = std::move(m_pictsQueue.front());
+            auto pict = m_pictsQueue.front();//std::move() will destry entry with pop ???
             m_pictsQueue.pop_front();
-            std::string mime = pict->getMime();
-            if (!pict->hasThumbnail()
-              && !mime.empty()) {   // isMimeSupported shoud have been checked before
-                std::string uri = pict->getUri();
-                //std::cout << "DbusWorker::queue uri " << uri
-				//	      << " mime " << mime
-				//	      << std::endl;
-                m_pictsInqueue.insert(std::pair<std::string, Pict *>(uri, pict));
-                uris.push_back(uri);
-                mimes.push_back(mime);
-                if (mimes.size() >= QUEUE_COUNT) {
-                    break;
+            if (auto lpict = pict.lease()) {
+                std::string mime = lpict->getMime();
+                if (!lpict->hasThumbnail()
+                  && !mime.empty()) {   // isMimeSupported shoud have been checked before
+                    std::string uri = lpict->getUri();
+                    //std::cout << "DbusWorker::queue uri " << uri
+                    //	      << " mime " << mime
+                    //	      << std::endl;
+                    m_pictsInqueue.insert(std::pair(uri, pict));
+                    uris.push_back(uri);
+                    mimes.push_back(mime);
+                    if (mimes.size() >= QUEUE_COUNT) {
+                        break;
+                    }
                 }
             }
         }
@@ -208,7 +211,7 @@ DbusWorker::on_ready(guint32 handle, std::vector<Glib::ustring> ready)
         //std::cout << "Ready[" << i << "] " << ready[i] << std::endl;
         auto p = m_pictsInqueue.find(rdy);
         if (p != m_pictsInqueue.end()) {
-            Pict *pict = p->second;
+            auto pict = p->second;
             Glib::RefPtr<Gio::File> thumbnail = getCache(rdy);
             setThumbnail(pict, thumbnail);
             m_pictsInqueue.erase(rdy);
@@ -264,7 +267,7 @@ DbusWorker::isMimeSupported(const std::string mime)
 
 
 void
-DbusWorker::queue(Pict * pict)
+DbusWorker::queue(const psc::mem::active_ptr<Pict>& pict)
 {
     m_pictsQueue.push_back(pict);
 	m_queueDispatcher.emit();
@@ -296,49 +299,55 @@ DbusWorker::getMd5Hash(const Glib::ustring &uri)
 }
 
 void
-DbusWorker::setThumbnail(Pict *pict, Glib::RefPtr<Gio::File> thumbnail)
+DbusWorker::setThumbnail(const psc::mem::active_ptr<Pict>& pict, Glib::RefPtr<Gio::File> thumbnail)
 {
     // try to offload the costly file access from dbus event handling
-    //std::cout << "DbusWorker::setThumbnail path " << thumbnail->get_path() << std::endl;
-    pict->setThumbnail(thumbnail);
-    if (!m_thumbnailReader.valid()) {
-        //std::cout << "thumbs not valid creating async" << std::endl;
-        m_thumbnailReader = std::async(std::launch::async, &DbusWorker::readThumbnails, this);
+    psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("DbusWorker::setThumbnail path %s", thumbnail->get_path()));
+    if (auto lpict = pict.lease()) {
+        lpict->setThumbnail(thumbnail);
+        if (!m_thumbnailReader.valid()) {
+            //std::cout << "thumbs not valid creating async" << std::endl;
+            m_thumbnailReader = std::async(std::launch::async, &DbusWorker::readThumbnails, this);
+        }
     }
-    m_thumbnailReaderQueue.emplace_back(pict);
+    m_thumbnailReaderQueue.push_back(pict); // as we want to keep previous reference push is the way to go
 }
 
 void
 DbusWorker::readThumbnails()
 {
     uint32_t read = 0;
+    //std::cout << "DbusWorker::readThumbnails" << std::endl;
     while (m_thumbnailReaderQueue.isActive()) {
-        Pict* pict = m_thumbnailReaderQueue.pop_front();
-        if (pict == nullptr
+        auto pict = m_thumbnailReaderQueue.pop_front();
+        if (!pict
          || !m_thumbnailReaderQueue.isActive()) {
             break;
         }
-        Glib::RefPtr<Gio::File> thumbnail = pict->getThumbnail();
-        if (thumbnail->query_exists()) {
-            //std::cout << "read thumbnail " << pict->getFileName() << std::endl;
-            try {
-                auto pixbuf = Gdk::Pixbuf::create_from_file(thumbnail->get_path());
-				// create w/o transparency
-				//auto pixbuf2 = removeTransparency(pixbuf, 256, 256);
-                pict->setPixbuf(pixbuf);
-                m_Dispatcher.emit();
-                ++read;
-                //std::cout << "read thumbnail " << read << std::endl;
+        //std::cout << "DbusWorker::readThumbnails got " << pict << std::endl;
+        if (auto lpict = pict.lease()) {
+            Glib::RefPtr<Gio::File> thumbnail = lpict->getThumbnail();
+            if (thumbnail->query_exists()) {
+                //std::cout << "read thumbnail " << pict->getFileName() << std::endl;
+                try {
+                    auto pixbuf = Gdk::Pixbuf::create_from_file(thumbnail->get_path());
+                    // create w/o transparency
+                    //auto pixbuf2 = removeTransparency(pixbuf, 256, 256);
+                    lpict->setPixbuf(pixbuf);
+                    m_Dispatcher.emit();
+                    ++read;
+                    //std::cout << "read thumbnail " << read << std::endl;
+                }
+                catch (const Glib::FileError &exc) {
+                    std::cerr << "File exc " << thumbnail->get_path() << " " << exc.what() << std::endl;
+                }
+                catch (const Gdk::PixbufError &exc) {
+                    std::cerr << "Pixbuf exc " << thumbnail->get_path() << " " << exc.what() << std::endl;
+                }
             }
-            catch (const Glib::FileError &exc) {
-                std::cerr << "File exc " << thumbnail->get_path() << " " << exc.what() << std::endl;
+            else {
+                std::cerr << "Coud not find pict " << thumbnail->get_path() << std::endl;
             }
-            catch (const Gdk::PixbufError &exc) {
-                std::cerr << "Pixbuf exc " << thumbnail->get_path() << " " << exc.what() << std::endl;
-            }
-        }
-        else {
-            std::cerr << "Coud not find pict " << thumbnail->get_path() << std::endl;
         }
     }
 }

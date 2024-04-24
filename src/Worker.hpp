@@ -19,6 +19,7 @@
 
 #include <glibmm.h>
 #include <gtkmm.h>
+#include <active_ptr.hpp>
 
 
 class Pict;
@@ -28,7 +29,7 @@ public:
     Worker(Glib::Dispatcher &_Dispatcher, Glib::Dispatcher& _readyDispatcher);
     virtual ~Worker();
 
-    virtual void queue(Pict * pict) = 0;
+    virtual void queue(const psc::mem::active_ptr<Pict>& pict) = 0;
     virtual bool isMimeSupported(const std::string mime) = 0;
     static Worker* create(Glib::Dispatcher &_Dispatcher, Glib::Dispatcher &_readyDispatcher);
 

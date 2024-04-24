@@ -24,20 +24,21 @@ enum class Animation {
 };
 
 #include <string>
-
-#include "Geometry.hpp"
-#include "GeometryContext.hpp"
-#include "MarkContext.hpp"
-#include "Font.hpp"
-#include "TextContext.hpp"
+#include <Geom2.hpp>
+#include <Text2.hpp>
+#include <GeometryContext.hpp>
+#include <MarkContext.hpp>
+#include <Font2.hpp>
+#include <TextContext.hpp>
 
 
 class Layout;
 
-class Tile : public Geometry {
+class Tile
+: public psc::gl::Geom2 {
 public:
     Tile(GLenum type, GeometryContext *_ctx);
-    virtual ~Tile();
+    virtual ~Tile() = default;
 
     void scaleTo(float scale);
     void setToScale(float scale);
@@ -51,7 +52,7 @@ public:
     virtual std::string getFileName() const = 0;
     Animation getAnimation();
     virtual const Glib::ustring &getName() = 0;
-    void displayText(Matrix &projView, MarkContext *textContext, Font *font, Layout *layout);
+    void displayText(Matrix &projView, MarkContext *textContext, const psc::gl::ptrFont2& font, const std::shared_ptr<Layout>& layout);
     void setTextVisible(bool visible);
     void setModified(guint64 modified);
     guint64 getModified() const;
@@ -64,7 +65,7 @@ private:
     Rotational m_toRotate;
     Animation m_animation;
     gint64 m_started;
-    Text *m_text;
+    psc::gl::aptrText2 m_text;
     bool m_textVisible;
     guint64 m_modified;
 };

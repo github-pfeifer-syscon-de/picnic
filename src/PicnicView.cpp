@@ -23,29 +23,29 @@
 #include <epoxy/gl.h>
 #include <iostream>
 #include <GL/glu.h>
-#include <wchar.h>
-#include <math.h>
+#include <cmath>
 #include <memory>
-
+#include <cstring>      // memset
+#include <StringUtils.hpp>
 
 #include "PicnicView.hpp"
 #include "DbusWorker.hpp"
-#include "StringUtils.hpp"
 #include "RectLayout.hpp"
 #include "CubeLayout.hpp"
 #include "RollLayout.hpp"
 #include "ImageView.hpp"
 #include "PicnicWindow.hpp"
 #include "FileFinder.hpp"
+#include "config.h"
 
-Gray::Gray()
-: Tex()
+Gray::Gray(uint32_t width, uint32_t height)
+: psc::gl::Tex2()
 {
-	unsigned char buf[16*16*3];
-	for (guint32 i = 0; i < sizeof(buf); ++i) {
-		buf[i] = 0x40;
-	}
-	create(16, 16, &buf, GL_RGB);
+    auto size = width * height * 3u;
+	auto buf = new uint8_t[size];
+    memset(buf, 0x40, size);
+	create(width, height, buf, GL_RGB);
+    delete[] buf;
 }
 
 GLint
@@ -59,15 +59,13 @@ PicnicView::PicnicView(ApplicationSupport& appSupport, Gtk::Label* entry)
 , pictContext{nullptr}
 , textContext{nullptr}
 , m_glArea{nullptr}
-, m_font{nullptr}
 , m_pictures()
-, m_gray{nullptr}
 , m_Dispatcher()
 , m_readyDispatcher()
 , m_loadDispatcher()
-, m_layout{nullptr}
 , m_appSupport{appSupport}
 , m_fileFinder{nullptr}
+, m_log{psc::log::Log::create("picnic")}
 {
     m_Dispatcher.connect(sigc::mem_fun(*this, &PicnicView::on_notification_from_worker_thread));
     m_readyDispatcher.connect(sigc::mem_fun(*this, &PicnicView::on_ready_from_worker_thread));
@@ -78,10 +76,6 @@ PicnicView::PicnicView(ApplicationSupport& appSupport, Gtk::Label* entry)
 PicnicView::~PicnicView()
 {
     // destroy is done with unrealize as it has the right context for gl resouces
-    if (m_layout) {
-        delete m_layout;
-        m_layout = nullptr;
-    }
 }
 
 Position
@@ -114,11 +108,13 @@ PicnicView::on_notification_from_worker_thread()
     if (m_glArea != nullptr
 	 && pictContext != nullptr) {	// this is important !!! otherwise this will crash in dri-lib !!!
         m_glArea->make_current();
-        for (auto p : m_pictures) {
-            p->create(*pictContext);  // test them all, internally checked if creation is needed
+        for (auto& p : m_pictures) {
+            if (auto lp = p.lease()) {
+                lp->create(*pictContext);  // test them all, internally checked if creation is needed
+            }
         }
         m_glArea->queue_draw();
-        //std::cout << "PicnicView::on_notification_from_worker_thread" << std::endl;
+        m_log->debug("PicnicView::on_notification_from_worker_thread");
     }
  }
 
@@ -138,8 +134,7 @@ PicnicView::init_shaders(Glib::Error &error)
         error = err;
         ret = false;
     }
-	//std::cout << "PicnicView::init_shaders " << (ret ? "ok" : "fail") << std::endl;
-
+    m_log->info(Glib::ustring::sprintf("PicnicView::init_shaders %s", (ret ? "ok" : "fail")));
     return ret;
 }
 
@@ -155,8 +150,10 @@ PicnicView::needsAnimation()
 {
     //gint64 start = g_get_monotonic_time();
     bool ret = false;
-    for (auto pict : m_pictures) {
-        ret |= pict->advance();
+    for (auto& pict : m_pictures) {
+        if (auto lpict = pict.lease()) {
+            ret |= lpict->advance();
+        }
     }
     //gint64 end = g_get_monotonic_time();
     //double dt = ((double)(end - start)) / 1.0e6;
@@ -169,15 +166,15 @@ PicnicView::init(Gtk::GLArea *glArea)
 {
     m_glArea = (NaviGlArea *)glArea;
 
-    m_font = new Font("sans-serif");    //
+    m_font = std::make_shared<psc::gl::Font2>("sans-serif");    //
     // this solves our text garbling, but by increasing startup time
     if (textContext) {
         m_font->createDefault(textContext, GL_TRIANGLES);
     }
-    m_layout = new RollLayout(m_glArea);
-    m_gray = new Gray();
+    m_layout = std::make_shared<RollLayout>(m_glArea);
+    m_gray = psc::mem::make_active<Gray>();
 	m_fileFinder = new FileFinder(this);
-	//std::cout << "PicnicView::init Worker::create" << std::endl;
+    m_log->info("PicnicView::init Worker::create");
     m_worker = Worker::create(m_Dispatcher, m_readyDispatcher);
 }
 
@@ -224,10 +221,12 @@ bool
 PicnicView::add_file(const std::string& mime, Glib::RefPtr<Gio::FileInfo>& fileInfo, Glib::RefPtr<Gio::File>& file) {
 	if (m_worker->isMimeSupported(mime)) {
 		Glib::ustring uName = fileInfo->get_name();   // glib might use utf-8 by default
-		Pict *pict = new Pict(file, uName, mime, pictContext);
-		pict->setGray(m_gray);
-		guint64 modified = fileInfo->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED);
-		pict->setModified(modified);
+		auto pict = psc::mem::make_active<Pict>(file, uName, mime, pictContext);
+        if (auto lpict = pict.lease()) {
+            lpict->setGray(m_gray);
+            guint64 modified = fileInfo->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED);
+            lpict->setModified(modified);
+        }
 		m_layout->add(pict);
 		m_pictures.push_back(pict);
 		//getIcon(fileInfo);
@@ -235,7 +234,7 @@ PicnicView::add_file(const std::string& mime, Glib::RefPtr<Gio::FileInfo>& fileI
 		m_worker->queue(pict);
 	}
 	else {
-		std::cout << "rejected mime " << mime << " " << file->get_basename() << std::endl;
+        m_log->warn(Glib::ustring::sprintf("rejected mime %s for %s", mime, file->get_basename()));
 	}
     uint32_t maxFiles = getMaxFiles();
 	return m_pictures.size() < maxFiles;
@@ -261,12 +260,12 @@ PicnicView::loadDispatcherEmit()
 			break;
 		}
 	}
-	std::cout << "PicnicView::loadDispatcherEmit 2" << std::endl;
+	m_log->info("PicnicView::loadDispatcherEmit 2");
 
 	m_layout->position(true, m_glArea->get_width(), m_glArea->get_height());     // position incrementally, even if retrival is faster than our screen at least for a limited number
 	// need if icons shoud be used on_notification_from_worker_thread();
 	m_glArea->queue_draw();
-	//std::cout << "files " << m_pictures.size() << std::endl;
+	m_log->info(Glib::ustring::sprintf("Files %d", m_pictures.size() ));
     m_loadDispatcher.emit();
 }
 
@@ -299,12 +298,8 @@ PicnicView::unrealize()
     if (textContext)
         delete textContext;
 
-    if (m_font != nullptr) {
-        delete m_font;
-    }
-    if (m_gray != nullptr) {
-        delete m_gray;
-    }
+    m_font.reset();
+    m_gray.reset();
 }
 
 void
@@ -317,7 +312,7 @@ PicnicView::draw(Gtk::GLArea *glArea, Matrix &proj, Matrix &view)
     }
 
     pictContext->use();
-    checkError("useProgram");
+    psc::gl::checkError("useProgram");
     Color c(1.0f, 1.0f, 1.0f);
     pictContext->setColor(c);
 
@@ -326,13 +321,15 @@ PicnicView::draw(Gtk::GLArea *glArea, Matrix &proj, Matrix &view)
     Matrix projView = proj * view;
 
     pictContext->display(projView);
-    checkError("display pict");
+    psc::gl::checkError("display pict");
     pictContext->unuse();
 
     textContext->use();
-    checkError("initDraw text");
-    for (auto p : m_pictures) {
-        p->displayText(projView, textContext, m_font, m_layout);
+    psc::gl::checkError("initDraw text");
+    for (auto& p : m_pictures) {
+        if (auto lp = p.lease()) {
+            lp->displayText(projView, textContext, m_font, m_layout);
+        }
     }
     textContext->unuse();
     //gint64 end = g_get_monotonic_time();
@@ -373,10 +370,10 @@ PicnicView::on_resize(int width, int height)
 }
 
 
-Geometry *
+psc::gl::aptrGeom2
 PicnicView::on_click_select(GdkEventButton* event, float mx, float my)
 {
-    Geometry *selected = pictContext->hit(mx, my);
+    auto selected = pictContext->hit2(mx, my);
     return selected;
 }
 
@@ -406,10 +403,6 @@ void
 PicnicView::clear()
 {
     m_layout->clear();
-    for (auto p : m_pictures) {
-        Pict *pict = p;
-        delete pict;
-    }
     m_pictures.clear();
 }
 
@@ -417,11 +410,17 @@ void
 PicnicView::on_action_view()
 {
     const int32_t front = m_layout->getFront();
-    const TVectorConcurrent<Tile *>& tiles = m_layout->getTiles();  // these are sorted
+    auto& tiles = m_layout->getTiles();  // these are sorted
     std::vector<Glib::RefPtr<Gio::File>>  picts;
     for (auto i = tiles.begin(); i != tiles.end(); ++i) {
-        Pict * pict = (Pict *)*i;
-        picts.push_back(pict->getPath());
+        auto tile = *i;
+        auto pict = psc::mem::dynamic_pointer_cast<Pict>(tile);
+        if (auto lpict = pict.lease()) {
+            picts.push_back(lpict->getPath());
+        }
+        else {
+        	m_log->error(Glib::ustring::sprintf("Failed to cast tile to pict %s", typeid(tile).name()));
+        }
     }
 	ImageView<Gtk::Window,GtkWindow>::showView(front, picts, m_appSupport);
 }

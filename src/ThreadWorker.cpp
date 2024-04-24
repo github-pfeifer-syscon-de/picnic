@@ -44,20 +44,22 @@ ThreadWorker::~ThreadWorker()
 }
 
 void
-ThreadWorker::loadScaled(Pict* pict)
+ThreadWorker::loadScaled(const psc::mem::active_ptr<Pict>& pict)
 {
-    Glib::RefPtr<Gio::File> path = pict->getPath();
-    try {
-        //std::cout << "Reading " << path->get_path() << std::endl;
-        auto pix = Gdk::Pixbuf::create_from_file(path->get_path(), 256, 256, true);
-        pict->setPixbuf(pix);
-		m_Dispatcher.emit();    // keep updating view
-    }
-    catch (const Glib::FileError &exc) {
-        std::cerr << "File exc " << path->get_path() << " " << exc.what() << std::endl;
-    }
-    catch (const Gdk::PixbufError &exc) {
-        std::cerr << "Pixbuf exc " << path->get_path() << " " << exc.what() << std::endl;
+    if (auto lpict = pict.lease()) {
+        Glib::RefPtr<Gio::File> path = lpict->getPath();
+        try {
+            //std::cout << "Reading " << path->get_path() << std::endl;
+            auto pix = Gdk::Pixbuf::create_from_file(path->get_path(), 256, 256, true);
+            lpict->setPixbuf(pix);
+            m_Dispatcher.emit();    // keep updating view
+        }
+        catch (const Glib::FileError &exc) {
+            std::cerr << "File exc " << path->get_path() << " " << exc.what() << std::endl;
+        }
+        catch (const Gdk::PixbufError &exc) {
+            std::cerr << "Pixbuf exc " << path->get_path() << " " << exc.what() << std::endl;
+        }
     }
 }
 
@@ -66,7 +68,7 @@ ThreadWorker::work()
 {
      uint32_t read = 0;
      while (m_files.isActive()) {
-        Pict* pict = m_files.pop_front();
+        auto pict = m_files.pop_front();
         if (pict
          && m_files.isActive()) {
             loadScaled(pict);
@@ -77,7 +79,7 @@ ThreadWorker::work()
 }
 
 void
-ThreadWorker::queue(Pict * pict)
+ThreadWorker::queue(const psc::mem::active_ptr<Pict>& pict)
 {
     m_files.emplace_back(pict);
     if (m_workerThread == nullptr) {    // std:async woud be easier to handle...

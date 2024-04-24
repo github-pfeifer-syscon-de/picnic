@@ -30,11 +30,11 @@ public:
 
     virtual void position(bool scale, guint width, guint height) override;
     virtual void hover(float mx, float my);
-    virtual float getZposition(const Tile *tile);
+    virtual float getZposition(const psc::mem::active_ptr<Tile>& tile);
     bool scroll(GdkEventScroll* event) override;
     Position getTextPosition(const Position &pos) override;
     int32_t getFront() const override;
-    void add(Tile *tile) override;
+    void add(const psc::mem::active_ptr<Tile>& tile) override;
 
 protected :
     void placeTiles();

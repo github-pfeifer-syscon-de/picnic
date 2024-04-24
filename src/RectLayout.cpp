@@ -32,7 +32,7 @@ RectLayout::~RectLayout()
 }
 
 float
-RectLayout::getZposition(const Tile *tile)
+RectLayout::getZposition(const psc::mem::active_ptr<Tile>& tile)
 {
     return 0.0f;
 }
@@ -67,16 +67,18 @@ RectLayout::position(bool scale, guint width, guint height)
     float y = yl;
     for (auto p : m_tiles) {
         float z = getZposition(p);
-        if (scale) {
-            float fscale = std::min(sx, sy)*0.9f;
-            p->scale(fscale);
-        }
-        Position pos(x, y, z);
-        p->setPosition(pos);
-        x += sx;
-        if (x >= xl) {
-            y -= sy;
-            x = -xl;
+        if (auto lp = p.lease()) {
+            if (scale) {
+                float fscale = std::min(sx, sy)*0.9f;
+                lp->scale(fscale);
+            }
+            Position pos(x, y, z);
+            lp->setPosition(pos);
+            x += sx;
+            if (x >= xl) {
+                y -= sy;
+                x = -xl;
+            }
         }
     }
 }
@@ -94,27 +96,35 @@ RectLayout::hover(float mx, float my)
     bool hit = false;
     uint32_t n = 0;
     for (auto pict : m_tiles) {
-        if (pict->hit(mx, my)) {
-            hit = true;
-            m_front = n;
-            if (m_last != nullptr
-             && m_last != pict) {
-                m_last->setToScale(1.0f);
-                m_last = nullptr;
+        if (auto lpict = pict.lease()) {
+            if (lpict->hit(mx, my)) {
+                hit = true;
+                m_front = n;
+                if (m_last
+                 && m_last != pict) {
+                    if (auto llast = m_last.lease()) {
+                        llast->setToScale(1.0f);
+                    }
+                    m_last = nullptr;
+                }
+                if (!m_last
+                 || m_last != pict) {
+                    if (auto lpict = pict.lease()) {
+                        lpict->setToScale(2.5f);
+                    }
+                    m_last = pict;
+                }
+                break;
             }
-            if (m_last == nullptr
-             || m_last != pict) {
-                pict->setToScale(2.5f);
-                m_last = pict;
-            }
-            break;
         }
         ++n;
     }
     if (!hit
-     && m_last != nullptr) {
-        m_last->setToScale(1.0f);   // ret scale on leaving img
-        m_last = nullptr;
+     && m_last) {
+        if (auto llast = m_last.lease()) {
+            llast->setToScale(1.0f);   // ret scale on leaving img
+        }
+        m_last.reset();
     }
 }
 

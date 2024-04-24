@@ -19,10 +19,9 @@
 
 #include <gtkmm.h>
 #include <string>
-
-#include "Geometry.hpp"
-#include "TextContext.hpp"
-#include "Tile.hpp"
+#include <Geom2.hpp>
+#include <TextContext.hpp>
+#include <Tile.hpp>
 
 
 enum class State {
@@ -31,22 +30,24 @@ enum class State {
     COMPLETE
 };
 
-class Pict :  public Tile {
+class Pict
+:  public Tile
+{
 public:
     Pict(const Glib::RefPtr<Gio::File> path, const Glib::ustring &name, const std::string mime, TextContext *pictContext);
-    virtual ~Pict();
+    virtual ~Pict() = default;
     void load();
     void scale(float scale) override;
     void setPosition(Position &pos) override;
     bool create(TextContext &pictContext);
-    Geometry *getPlane();
+    psc::gl::aptrGeom2 getPlane();
     const Glib::ustring &getName() override;
     const Glib::RefPtr<Gio::File> getPath() const;
     std::string getUri();
     std::string getMime();
     void display(const Matrix &projView) override;
     bool hasThumbnail();
-    void setGray(Tex *gray);
+    void setGray(const psc::gl::aptrTex2& gray);
     void setPixbuf(Glib::RefPtr<Gdk::Pixbuf>& pix);
     std::string getFileName() const override;
     void setThumbnail(Glib::RefPtr<Gio::File>& thumbnail);
@@ -56,10 +57,10 @@ private:
     Glib::RefPtr<Gio::File> m_path;
     Glib::ustring m_name;
     std::string m_mime;
-    Tex *m_tex;
+    psc::gl::aptrTex2 m_tex;
     Glib::RefPtr<Gdk::Pixbuf> m_pix;
     //float m_scale;
-    Tex *m_gray;
+    psc::gl::aptrTex2 m_gray;
     Glib::RefPtr<Gio::File> m_thumbnail;
     State m_state;
 };

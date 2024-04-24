@@ -39,7 +39,7 @@ class CompareByName  {
 };
 
 Tile::Tile(GLenum type, GeometryContext *_ctx)
-: Geometry(type, _ctx)
+: psc::gl::Geom2(type, _ctx)
 , m_toScale{1.0f}
 , m_aktScale{1.0f}
 , m_baseScale{1.0f}
@@ -50,15 +50,6 @@ Tile::Tile(GLenum type, GeometryContext *_ctx)
 , m_text{nullptr}
 , m_textVisible{true}
 {
-}
-
-
-Tile::~Tile()
-{
-    if (m_text) {
-        delete m_text;
-        m_text = nullptr;
-    }
 }
 
 void
@@ -95,7 +86,7 @@ Tile::setRotation(const Rotational &rotate)
 {
     m_startRotate = rotate;
     m_toRotate = rotate;
-    Geometry::setRotation(rotate);
+    psc::gl::Geom2::setRotation(rotate);
 }
 
 void
@@ -104,7 +95,7 @@ Tile::setScale(float scale)
     m_aktScale = scale;
     m_toScale =  scale;
     m_baseScale = scale;
-    Geometry::setScale(scale);
+    psc::gl::Geom2::setScale(scale);
 }
 
 Animation
@@ -122,7 +113,7 @@ Tile::advance()
         if (dt <= 1.0) {
             if (m_animation == Animation::SCALE) {
                 m_aktScale = glm::mix(m_aktScale, m_toScale, dt);  //m_aktScale -> ease looks nice,  m_baseScale -> linear looks lame
-                Geometry::setScale(m_aktScale);
+                psc::gl::Geom2::setScale(m_aktScale);
             }
             else if (m_animation == Animation::ROTATE) {
                 float phiStart = m_startRotate.getPhi();
@@ -142,16 +133,16 @@ Tile::advance()
                 //              << " act " << thetaAkt << std::endl;
                 //}
                 Rotational m_aktRotate(phiAkt, thetaAkt, psiAkt);
-                Geometry::setRotation(m_aktRotate);
+                psc::gl::Geom2::setRotation(m_aktRotate);
             }
         }
         else if (dt > 1.0) {
             //std::cout << "Tile::advance to " << m_aktRotate.getTheta() << std::endl;
             if (m_animation == Animation::SCALE) {  // at end match expected value
-                Geometry::setScale(m_toScale);
+                psc::gl::Geom2::setScale(m_toScale);
             }
             else if (m_animation == Animation::ROTATE) {
-                Geometry::setRotation(m_toRotate);
+                psc::gl::Geom2::setRotation(m_toRotate);
             }
             m_animation = Animation::NONE;
         }
@@ -164,25 +155,29 @@ void
 Tile::setTextVisible(bool visible)
 {
     m_textVisible = visible;    // remember if not yet created
-    if (m_text != nullptr) {
-        m_text->setVisible(visible);
+    if (auto ltext = m_text.lease()) {
+        ltext->setVisible(visible);
     }
 }
 
 void
-Tile::displayText(Matrix &projView, MarkContext *textContext, Font *font, Layout* layout)
+Tile::displayText(Matrix &projView, MarkContext *textContext, const psc::gl::ptrFont2& font, const std::shared_ptr<Layout>& layout)
 {
     Position& akt = getPos();
     Position pos = layout->getTextPosition(akt);
-    if (m_text == nullptr) {
-        m_text = new Text(GL_TRIANGLES, textContext, font); // GL_LINES triangles are more effort but the full depth check matters
-        const Glib::ustring txt = getName();
-        m_text->setText(txt);
-        m_text->setVisible(m_textVisible);
+    if (!m_text) {
+        m_text = psc::mem::make_active<psc::gl::Text2>(GL_TRIANGLES, textContext, font); // GL_LINES triangles are more effort but the full depth check matters
+        if (auto ltext = m_text.lease()) {
+            const Glib::ustring txt = getName();
+            ltext->setText(txt);
+            ltext->setVisible(m_textVisible);
+        }
     }
-    m_text->setPosition(pos);
-    m_text->setScale(m_scale * 0.0012f);      // Quads 0.05f triangles 0.0012f
-    m_text->display(projView);
+    if (auto ltext = m_text.lease()) {
+        ltext->setPosition(pos);
+        ltext->setScale(m_scale * 0.0012f);      // Quads 0.05f triangles 0.0012f
+        ltext->display(projView);
+    }
 }
 
 void

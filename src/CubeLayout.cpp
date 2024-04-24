@@ -29,8 +29,8 @@
 
 CubeLayout::CubeLayout(NaviGlArea *glArea)
 : RectLayout(glArea)
-, m_min{UINT64_MAX}
-, m_max{0}
+, m_min{std::numeric_limits<uint64_t>::max()}
+, m_max{std::numeric_limits<uint64_t>::min()}
 {
 }
 
@@ -43,22 +43,27 @@ void
 CubeLayout::position(bool scale, guint width, guint height)
 {
     for (auto p : m_tiles) {
-        guint64 modified = p->getModified();
-        m_min = std::min(m_min, modified);
-        m_max = std::max(m_max, modified);
+        if (auto lp = p.lease()) {
+            guint64 modified = lp->getModified();
+            m_min = std::min(m_min, modified);
+            m_max = std::max(m_max, modified);
+        }
     }
     RectLayout::position(scale, width, height);
 }
 
 float
-CubeLayout::getZposition(const Tile *tile)
+CubeLayout::getZposition(const psc::mem::active_ptr<Tile>& tile)
 {
 #ifdef __x86_64__
     guint64 diff = std::max(1ul, m_max - m_min);
 #else
     guint64 diff = std::max(1ull, m_max - m_min);
 #endif
-    guint modified = tile->getModified();
-    float z = (float)((double)(m_max - modified) / (double)diff) * -10.0f;
-    return z;
+    if (auto ltile = tile.lease()) {
+        guint modified = ltile->getModified();
+        float z = (float)((double)(m_max - modified) / (double)diff) * -10.0f;
+        return z;
+    }
+    return 0.0f;
 }

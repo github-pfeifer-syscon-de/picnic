@@ -33,19 +33,10 @@ Pict::Pict(const Glib::RefPtr<Gio::File> path, const Glib::ustring &name, const 
 {
 }
 
-
-Pict::~Pict()
-{
-    if (m_tex) {
-        delete m_tex;
-        m_tex = nullptr;
-    }
-}
-
 void
 Pict::setPosition(Position &pos)
 {
-    Geometry::setPosition(pos);
+    psc::gl::Geom2::setPosition(pos);
 }
 
 void
@@ -67,32 +58,40 @@ Pict::scale(float scale)
         setScale(m_scale);
 
         create_vao();
-        checkError("temp createVao");
+        psc::gl::checkError("temp createVao");
     }
 }
 
 void
 Pict::display(const Matrix &projView)
 {
-    if (m_tex != nullptr) {
-		//std::cout << "Pict::display tex " << getFileName() << std::endl;
-        m_tex->use(GL_TEXTURE0);
-        if (m_tex->getTex() == 0) {
-            std::cout << getFileName() << " tex " <<  m_tex->getTex() << std::endl;
+    if (m_tex) {
+        if (auto ltex = m_tex.lease()) {
+            //std::cout << "Pict::display tex " << getFileName() << std::endl;
+            ltex->use(GL_TEXTURE0);
+            if (ltex->getTex() == 0) {
+                std::cout << getFileName() << " tex " <<  ltex->getTex() << std::endl;
+            }
         }
     }
     else {
 		//std::cout << "Pict::display gray " << getFileName() << std::endl;
-        m_gray->use(GL_TEXTURE0);
+        if (auto lgray = m_gray.lease()) {
+            lgray->use(GL_TEXTURE0);
+        }
     }
-
+    // the above stretches the convention as the object is implicitly used ... by GL
 	//std::cout << "Pict::display display " << getFileName() << std::endl;
-    Geometry::display(projView);
-    if (m_tex != nullptr) {
-        m_tex->unuse();
+    psc::gl::Geom2::display(projView);
+    if (m_tex) {
+        if (auto ltex = m_tex.lease()) {
+            ltex->unuse();
+        }
     }
     else {
-        m_gray->unuse();
+        if (auto lgray = m_gray.lease()) {
+            lgray->unuse();
+        }
     }
 	//std::cout << "Pict::display end " << getFileName() << std::endl;
 }
@@ -150,7 +149,7 @@ Pict::hasThumbnail()
 }
 
 void
-Pict::setGray(Tex *gray)
+Pict::setGray(const psc::gl::aptrTex2& gray)
 {
     m_gray = gray;
 }
@@ -190,11 +189,12 @@ Pict::create(TextContext &pictContext)
     //setScale(m_scale);
     //Geometry::setRotation(m_rotate);
     create_vao();
-    checkError("real createVao");
-    pictContext.addGeometry(this);
+    psc::gl::checkError("real createVao");
 
-    auto tex = new Tex();
-    tex->create(m_pix);
+    auto tex = psc::mem::make_active<psc::gl::Tex2>();
+    if (auto ltex = tex.lease()) {
+        ltex->create(m_pix);
+    }
 	m_tex = tex;
     m_state = State::COMPLETE;
 

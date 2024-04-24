@@ -16,22 +16,27 @@
  */
 
 
-#include "NaviGlArea.hpp"
+#include <NaviGlArea.hpp>
 #include "Layout.hpp"
 #include "Tile.hpp"
 
 class CompareByName  {
     public:
-    bool operator()(const Tile * a, const Tile * b) {
-        if (a == nullptr) {
-            return FALSE;
+    bool operator()(const psc::mem::active_ptr<Tile>& a, const psc::mem::active_ptr<Tile>& b) {
+        if (!a) {
+            return false;
         }
-        if (b == nullptr) {
-            return TRUE;
+        if (!b) {
+            return true;
         }
-        bool gt = a->getFileName() > b->getFileName();
+        auto la = a.lease();
+        auto lb = b.lease();
+        if (la && lb) {
+            bool gt = la->getFileName() > lb->getFileName();
+            return gt;
+        }
+        return a.get() > b.get();   // just use some criteria ...
         //std::cout << "CompareByName " << a->getFileName()<< " " << (gt ? "<=" : ">") << " " << b->getFileName() << std::endl;
-        return gt;
     }
 };
 
@@ -49,7 +54,7 @@ Layout::~Layout()
 }
 
 void
-Layout::add(Tile *tile)
+Layout::add(const psc::mem::active_ptr<Tile>& tile)
 {
     m_tiles.push_back(tile);
     m_needSort = true;
@@ -80,7 +85,7 @@ Layout::scroll(GdkEventScroll* event)
 }
 
 
-const TVectorConcurrent<Tile *>&
+const TVectorConcurrent<psc::mem::active_ptr<Tile>>&
 Layout::getTiles()
 {
     return m_tiles;

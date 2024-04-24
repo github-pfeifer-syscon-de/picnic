@@ -19,16 +19,18 @@ class Tile;
 
 #include "RectLayout.hpp"
 
-class CubeLayout : public RectLayout {
+class CubeLayout
+: public RectLayout
+{
 public:
     CubeLayout(NaviGlArea *glArea);
     virtual ~CubeLayout();
 
     void position(bool scale, guint width, guint height) override;
-    float getZposition(const Tile *tile) override;
+    float getZposition(const psc::mem::active_ptr<Tile>& tile) override;
 private:
-    guint64 m_min;
-    guint64 m_max;
+    uint64_t m_min;
+    uint64_t m_max;
 };
 
 

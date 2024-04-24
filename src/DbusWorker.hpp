@@ -45,7 +45,7 @@ public:
     void on_error(guint32 handle, std::vector<Glib::ustring> error, gint32 err, Glib::ustring msg);
     Glib::RefPtr<Gio::File> getCache(Glib::ustring ready);
 
-    void queue(Pict * pict);
+    void queue(const psc::mem::active_ptr<Pict>&  pict);
     bool isMimeSupported(const std::string mime) override;
     void on_queue_check();
     const static char* THUMBNAIL1_NAME;
@@ -54,18 +54,18 @@ private:
     void queue();
     std::string getMd5Hash(const Glib::ustring &uri);
     void readThumbnails();
-    void setThumbnail(Pict *pict, Glib::RefPtr<Gio::File> thumbnail);
+    void setThumbnail(const psc::mem::active_ptr<Pict>& pict, Glib::RefPtr<Gio::File> thumbnail);
 
     Glib::RefPtr<org::freedesktop::thumbnails::Thumbnailer1> proxy;
-    std::list<Pict *> m_pictsQueue;      // pics queued list  (using queue woud be a bad idea)
-    std::map<std::string, Pict *> m_pictsInqueue;   // pics momentary in dbus processing
+    std::list<psc::mem::active_ptr<Pict>> m_pictsQueue;      // pics queued list  (using queue woud be a bad idea)
+    std::map<std::string, psc::mem::active_ptr<Pict>> m_pictsInqueue;   // pics momentary in dbus processing
     guint32 m_handle;
     Glib::ustring m_flavor;
     Glib::ustring m_scheduler;
     std::map<std::string, std::string> m_mimes;
     const uint32_t QUEUE_COUNT = 4; // do request in blocks to update incrementally
     mutable std::mutex  m_MutexBus;
-    TQueueConcurrent<Pict *> m_thumbnailReaderQueue;
+    TQueueConcurrent<psc::mem::active_ptr<Pict>> m_thumbnailReaderQueue;
     std::future<void> m_thumbnailReader;          // do file reading asychronously
     uint32_t m_queue;
     uint32_t m_ready;

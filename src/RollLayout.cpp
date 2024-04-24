@@ -36,7 +36,7 @@ RollLayout::~RollLayout()
 }
 
 float
-RollLayout::getZposition(const Tile *tile)
+RollLayout::getZposition(const psc::mem::active_ptr<Tile>& tile)
 {
     return 0.0f;
 }
@@ -76,35 +76,42 @@ RollLayout::scroll(GdkEventScroll* event)
 {
     float rotStep = getRotStep();
     float aktRot = 90.0f;       // the first movement will always skip the gap
-    bool textVisible = TRUE;
+    bool textVisible = true;
     if (event->direction == GDK_SCROLL_DOWN) {
-        textVisible = FALSE;
+        textVisible = false;
         for (uint32_t j = 0; j < m_tiles.size(); ++j) {
-            Tile *tile = m_tiles[(j + m_front) % m_tiles.size()];
-            Rotational rotate = tile->getRotateTo();    // if we get a event while moving accumulate movement -> smooth and fast
-            Rotational rotateTo(rotate.getPhi() + 0.0f, rotate.getTheta() + aktRot, rotate.getPsi() + 0.0f);
-            //std::cout << "down m_front " << m_front << " name " << tile->getFileName() << " from  " << rotate.getTheta() << " to " << rotateTo.getTheta() <<std::endl;
-            tile->setRotateTo(rotateTo);
-            tile->setTextVisible(textVisible);
-            aktRot = rotStep;
+            auto tile = m_tiles[(j + m_front) % m_tiles.size()];
+            if (auto ltile = tile.lease()) {
+                Rotational rotate = ltile->getRotateTo();    // if we get a event while moving accumulate movement -> smooth and fast
+                Rotational rotateTo(rotate.getPhi() + 0.0f, rotate.getTheta() + aktRot, rotate.getPsi() + 0.0f);
+                //std::cout << "down m_front " << m_front << " name " << tile->getFileName() << " from  " << rotate.getTheta() << " to " << rotateTo.getTheta() <<std::endl;
+                ltile->setRotateTo(rotateTo);
+                ltile->setTextVisible(textVisible);
+                aktRot = rotStep;
+            }
         }
         addToFront(+1);
-        m_tiles[m_front]->setTextVisible(TRUE);
+        auto tile = m_tiles[m_front];
+        if (auto ltile = tile.lease()) {
+            ltile->setTextVisible(true);
+        }
     }
     else if (event->direction == GDK_SCROLL_UP) {
         addToFront(-1);
         for (uint32_t j = 0; j < m_tiles.size(); ++j) {
-            Tile *tile = m_tiles[(j + m_front) % m_tiles.size()];
-            Rotational rotate = tile->getRotateTo();    // if we get a event while moving accumulate movement -> smooth and fast
-            Rotational rotateTo(rotate.getPhi() + 0.0f, rotate.getTheta() - aktRot, rotate.getPsi() + 0.0f);
-            //std::cout << "up m_front " << m_front << " name " << tile->getFileName() << " from  " << rotate.getTheta() << " to " << rotateTo.getTheta() <<std::endl;
-            tile->setRotateTo(rotateTo);
-            tile->setTextVisible(textVisible);
-            textVisible = FALSE;
+            auto tile = m_tiles[(j + m_front) % m_tiles.size()];
+            if (auto ltile = tile.lease()) {
+                Rotational rotate = ltile->getRotateTo();    // if we get a event while moving accumulate movement -> smooth and fast
+                Rotational rotateTo(rotate.getPhi() + 0.0f, rotate.getTheta() - aktRot, rotate.getPsi() + 0.0f);
+                //std::cout << "up m_front " << m_front << " name " << tile->getFileName() << " from  " << rotate.getTheta() << " to " << rotateTo.getTheta() <<std::endl;
+                ltile->setRotateTo(rotateTo);
+                ltile->setTextVisible(textVisible);
+            }
+            textVisible = false;
             aktRot = rotStep;
         }
     }
-    return TRUE;
+    return true;
 }
 
 void
@@ -128,26 +135,30 @@ RollLayout::placeTiles()
     bool textVisible = true;
     for (int32_t i = 0; i < (int)m_tiles.size(); ++i) {
         int j = (i + m_front) % (int)m_tiles.size();
-        Tile *tile = m_tiles[j];
+        auto tile = m_tiles[j];
         //std::cout <<  "RollLayout::placeTiles"
         //          << " name " << p->getFileName()
         //          << " j " << j <<  "/" << m_tiles.size()
         //          << " theta " << rotAct << std::endl;
-        Rotational rotate(0.0f, (float)rotAct, 0.0f);
-        tile->setRotation(rotate);
-        tile->setTextVisible(textVisible);
+        if (auto ltile = tile.lease()) {
+            Rotational rotate(0.0f, (float)rotAct, 0.0f);
+            ltile->setRotation(rotate);
+            ltile->setTextVisible(textVisible);
+        }
         textVisible = false;
         rotAct -= rotStep;
     }
 }
 
 void
-RollLayout::add(Tile *tile)
+RollLayout::add(const psc::mem::active_ptr<Tile>& tile)
 {
 	Layout::add(tile);
-	float fscale = 12.0f;
-	float z = getZposition(tile);
-	Position pos(-8.0f, 0.0f, z);
-	tile->scale(fscale);
-	tile->setPosition(pos);
+    if (auto ltile = tile.lease()) {
+        float fscale = 12.0f;
+        float z = getZposition(tile);
+        Position pos(-8.0f, 0.0f, z);
+        ltile->scale(fscale);
+        ltile->setPosition(pos);
+    }
 }

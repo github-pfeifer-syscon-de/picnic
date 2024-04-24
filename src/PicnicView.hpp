@@ -20,27 +20,34 @@
 #include <gtkmm.h>
 #include <string>
 #include <list>
+#include <TextContext.hpp>
+#include <MarkContext.hpp>
+#include <Font2.hpp>
+#include <Geom2.hpp>
+#include <NaviGlArea.hpp>
+#include <Scene.hpp>
+#include <ApplicationSupport.hpp>
+#include <memory>
+#include <Log.hpp>
 
-#include "TextContext.hpp"
-#include "MarkContext.hpp"
-#include "Font.hpp"
-#include "Geometry.hpp"
-#include "NaviGlArea.hpp"
+
 #include "Pict.hpp"
-#include "Scene.hpp"
 #include "Worker.hpp"
-#include "ApplicationSupport.hpp"
 
 class Layout;
 class FileFinder;
 
-class Gray : public Tex {
+class Gray
+: public psc::gl::Tex2
+{
 public:
-    Gray();
+    Gray(uint32_t width = 16, uint32_t height = 16);
     GLint getTexWrap() override;
 };
 
-class PicnicView : public Scene {
+class PicnicView
+: public Scene
+{
 public:
     PicnicView(ApplicationSupport& appSupport, Gtk::Label *entry);
     virtual ~PicnicView();
@@ -57,7 +64,7 @@ public:
     Gdk::EventMask getAddEventMask() override;
     bool on_motion_notify_event(GdkEventMotion* event, float mx, float my) override;
     void on_resize(int width, int height) override;
-    Geometry *on_click_select(GdkEventButton* event, float mx, float my) override;
+    psc::gl::aptrGeom2 on_click_select(GdkEventButton* event, float mx, float my) override;
     void on_file_dialog_response(int response_id, Gtk::FileChooserDialog* dialog);
     bool scroll(GdkEventScroll* event) override;
     Glib::RefPtr<Gio::File> getOpenDir();
@@ -76,17 +83,18 @@ private:
     TextContext* pictContext;
     MarkContext* textContext;
     NaviGlArea* m_glArea;
-    Font* m_font;
+    psc::gl::ptrFont2 m_font;
     gboolean view_update();
-    std::list<Pict *> m_pictures;
+    std::list<psc::mem::active_ptr<Pict>> m_pictures;
     Worker* m_worker;
-    Gray* m_gray;
+    psc::mem::active_ptr<Gray> m_gray;
     Glib::Dispatcher m_Dispatcher;  // used for thread notification
     Glib::Dispatcher m_readyDispatcher;     // used on worker ready
     Glib::Dispatcher m_loadDispatcher;      // used on load completed
-    Layout* m_layout;
+    std::shared_ptr<Layout> m_layout;
     ApplicationSupport& m_appSupport;
     FileFinder* m_fileFinder;
+    std::shared_ptr<psc::log::Log> m_log;
     const char *CONF_PATH = "path";
     const char *MAX_FILES = "maxFiles";
 };

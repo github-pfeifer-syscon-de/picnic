@@ -28,17 +28,17 @@ public:
     Layout(NaviGlArea *glArea);
     virtual ~Layout();
 
-    virtual void add(Tile *tile);
+    virtual void add(const psc::mem::active_ptr<Tile>&  tile);
     virtual void position(bool scale, guint width, guint height) = 0;
     virtual void hover(float mx, float my) = 0;
     virtual Position getTextPosition(const Position &pos) = 0;
     virtual int32_t getFront() const = 0;
     void clear();
     virtual bool scroll(GdkEventScroll* event);
-    const TVectorConcurrent<Tile *>& getTiles();
+    const TVectorConcurrent<psc::mem::active_ptr<Tile>>& getTiles();
     bool sort();
 protected:
-    TVectorConcurrent<Tile *> m_tiles;  // as additions will be asynchronously use concurrent version
+    TVectorConcurrent<psc::mem::active_ptr<Tile>> m_tiles;  // as additions will be asynchronously use concurrent version
     NaviGlArea *m_glArea;
 private:
     bool m_needSort;

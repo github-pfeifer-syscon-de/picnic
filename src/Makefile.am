@@ -11,11 +11,13 @@ AM_CPPFLAGS = \
 	$(OPENSSL_CFLAGS)
 
 
-AM_CFLAGS= \
-	-Wall
+AM_CFLAGS=
 
-AM_CXXFLAGS =\
-	-Wall
+# \ -Wall
+
+AM_CXXFLAGS =
+
+# \ -Wall
 
 bin_PROGRAMS = picnic
 
