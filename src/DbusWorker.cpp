@@ -302,7 +302,7 @@ void
 DbusWorker::setThumbnail(const psc::mem::active_ptr<Pict>& pict, Glib::RefPtr<Gio::File> thumbnail)
 {
     // try to offload the costly file access from dbus event handling
-    psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("DbusWorker::setThumbnail path %s", thumbnail->get_path()));
+    psc::log::Log::logAdd(psc::log::Level::Debug, Glib::ustring::sprintf("DbusWorker::setThumbnail path %s", thumbnail->get_path()));
     if (auto lpict = pict.lease()) {
         lpict->setThumbnail(thumbnail);
         if (!m_thumbnailReader.valid()) {
