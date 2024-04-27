@@ -18,9 +18,9 @@
 #include <iostream>
 #include <iomanip>
 #include <glm/common.hpp> // glm::mix
-#include <math.h>
+#include <cmath>
+#include <Text2.hpp>
 
-#include "Text.hpp"
 #include "Tile.hpp"
 #include "Layout.hpp"
 

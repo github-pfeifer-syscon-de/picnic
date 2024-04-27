@@ -299,7 +299,7 @@ PicnicView::unrealize()
         delete textContext;
 
     m_font.reset();
-    m_gray.reset();
+    m_gray.resetAll();
 }
 
 void

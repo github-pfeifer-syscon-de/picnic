@@ -124,7 +124,7 @@ RectLayout::hover(float mx, float my)
         if (auto llast = m_last.lease()) {
             llast->setToScale(1.0f);   // ret scale on leaving img
         }
-        m_last.reset();
+        m_last.resetAll();
     }
 }
 

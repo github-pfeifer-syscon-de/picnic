@@ -170,7 +170,7 @@ Pict::create(TextContext &pictContext)
     //        << " alph: " << (buf->get_has_alpha() ? "yes" : "no")
     //        << std::endl;
 
-    remove();   // remove temorary plane
+    deleteVertexArray();   // wes remove remove temorary plane
 
     float xaspect = std::min(1.0f, (float)m_pix->get_width() / (float)m_pix->get_height());
     float yaspect = std::min(1.0f, (float)m_pix->get_height() / (float)m_pix->get_width());
