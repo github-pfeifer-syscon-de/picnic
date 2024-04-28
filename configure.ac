@@ -20,9 +20,9 @@ PKG_CHECK_MODULES([EPOXY], [epoxy])
 
 PKG_CHECK_MODULES(GTHREAD, [gthread-2.0])
 
-PKG_CHECK_MODULES([GENERICGLM], [genericglm >= 0.3.0])
+PKG_CHECK_MODULES([GENERICGLM], [genericglm >= 0.3.1])
 
-PKG_CHECK_MODULES([GENERICIMG], [genericimg >= 0.2.0])
+PKG_CHECK_MODULES([GENERICIMG], [genericimg >= 0.3.1])
 
 dnl dont repeat dependencies
 dnl PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4])
