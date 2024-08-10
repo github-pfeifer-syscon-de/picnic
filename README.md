@@ -20,9 +20,13 @@ configure:<br>
 
 Developer info:
 <pre>
-# if you need to regenerate the interface the following might be helpful:
-#       thumbnail1.xml can be create with dfeet by calling introspection.
-#	the generated code needs manual tuning e.g. add private message member and closing brace, remove path for imports
-#	gdbus-codegen-glibmm2 --generate-cpp-code=${HOME}/src/Picnic/cpp/thumbnail1 ${HOME}/csrc/Picnic/res/thumbnail1.xml
-#???	gdbus-codegen-glibmm2 --generate-cpp-code=${HOME}/csrc/Picnic/cpp/cache1 ${HOME}/csrc/Picnic/res/cache1.xml
+   to regenerate the interface the following might be helpful:
+     this is somewhat incomplete as this wasn't simple on the first try, and i still have some difficulties to reproduce this
+       thumbnail1.xml can be create with dfeet by calling introspection.
+	the generated code needs manual tuning e.g. add private message member and closing brace, remove path for imports
+	clone https://github.com/Pelagicore/gdbus-codegen-glibmm
+        ensure the python dependencies are available e.g. python-setuptools, python-j2cli
+        use "python setup.py install --record egg-files.txt"
+        this allows unsinstall with "cat egg-files.txt | rm -rf"
+	gdbus-codegen-glibmm3 --generate-cpp-code=thumbnail1 thumbnail1.xml
 </pre>

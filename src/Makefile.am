@@ -43,8 +43,6 @@ picnic_SOURCES = \
 	PicnicView.cpp \
 	Pict.cpp \
 	Pict.hpp \
-	PicnicListWin.cpp \
-	PicnicListWin.hpp \
 	Tile.cpp \
 	Tile.hpp \
 	Layout.cpp \

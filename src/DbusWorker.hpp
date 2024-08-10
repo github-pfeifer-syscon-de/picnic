@@ -29,6 +29,8 @@
 #include "thumbnail1_proxy.h"
 #include "Pict.hpp"
 
+#undef DBUS_WORKER_DEBUG
+
 class DbusWorker : public Worker
 {
 public:
@@ -48,7 +50,7 @@ public:
     void queue(const psc::mem::active_ptr<Pict>&  pict);
     bool isMimeSupported(const std::string mime) override;
     void on_queue_check();
-    const static char* THUMBNAIL1_NAME;
+    const static constexpr auto THUMBNAIL1_NAME = "org.freedesktop.thumbnails.Thumbnailer1";
 private:
     void enqueue(const std::vector<Glib::ustring> &uris, const std::vector<Glib::ustring> &mimes);
     void queue();

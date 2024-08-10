@@ -25,8 +25,8 @@
 #include <GL/glu.h>
 #include <cmath>
 #include <memory>
-#include <cstring>      // memset
 #include <StringUtils.hpp>
+#include <KeyConfig.hpp>
 
 #include "PicnicView.hpp"
 #include "DbusWorker.hpp"
@@ -43,9 +43,11 @@ Gray::Gray(uint32_t width, uint32_t height)
 {
     auto size = width * height * 3u;
 	auto buf = new uint8_t[size];
-    memset(buf, 0x40, size);
-	create(width, height, buf, GL_RGB);
-    delete[] buf;
+    if (buf) {
+        std::fill(buf, buf+size, 0x40);
+        create(width, height, buf, GL_RGB);
+        delete[] buf;
+    }
 }
 
 GLint
@@ -182,10 +184,9 @@ PicnicView::init(Gtk::GLArea *glArea)
 Glib::RefPtr<Gio::File>
 PicnicView::getOpenDir()
 {
-    Glib::KeyFile* config = m_appSupport.getConfig();
-    if (config->has_group(PicnicWindow::CONF_GROUP)
-     && config->has_key(PicnicWindow::CONF_GROUP, CONF_PATH)) {
-        Glib::ustring pics = config->get_string(PicnicWindow::CONF_GROUP, CONF_PATH);
+    auto config = m_appSupport.getConfig();
+    if (config->hasKey(PicnicWindow::CONF_GROUP, CONF_PATH)) {
+        Glib::ustring pics = config->getString(PicnicWindow::CONF_GROUP, CONF_PATH);
         Glib::RefPtr<Gio::File> fPics = Gio::File::create_for_path(pics);
         if (fPics
          && fPics->query_exists()) {
@@ -194,7 +195,7 @@ PicnicView::getOpenDir()
     }
     Glib::ustring pics = Glib::get_home_dir();        // just start from somewhere
     Glib::RefPtr<Gio::File> fPics = Gio::File::create_for_path(pics);
-    config->set_string(PicnicWindow::CONF_GROUP, CONF_PATH, pics);
+    config->setString(PicnicWindow::CONF_GROUP, CONF_PATH, pics);
     m_appSupport.saveConfig();
     return fPics;
 }
@@ -202,14 +203,13 @@ PicnicView::getOpenDir()
 uint32_t
 PicnicView::getMaxFiles()
 {
-    Glib::KeyFile* config = m_appSupport.getConfig();
+    auto config = m_appSupport.getConfig();
     uint32_t maxFiles = 100;
-    if (config->has_group(PicnicWindow::CONF_GROUP)
-     && config->has_key(PicnicWindow::CONF_GROUP, MAX_FILES)) {
-         maxFiles = config->get_integer(PicnicWindow::CONF_GROUP, MAX_FILES);
+    if (config->hasKey(PicnicWindow::CONF_GROUP, MAX_FILES)) {
+         maxFiles = config->getInteger(PicnicWindow::CONF_GROUP, MAX_FILES);
     }
     else {
-        config->set_integer(PicnicWindow::CONF_GROUP, MAX_FILES, maxFiles);
+        config->setInteger(PicnicWindow::CONF_GROUP, MAX_FILES, maxFiles);
         m_appSupport.saveConfig();
     }
     return maxFiles;
@@ -226,6 +226,9 @@ PicnicView::add_file(const std::string& mime, Glib::RefPtr<Gio::FileInfo>& fileI
             lpict->setGray(m_gray);
             guint64 modified = fileInfo->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED);
             lpict->setModified(modified);
+#           ifdef DBUS_WORKER_DEBUG
+            std::cout << "adding " << lpict->getName() << std::endl;
+#           endif
         }
 		m_layout->add(pict);
 		m_pictures.push_back(pict);
@@ -274,8 +277,8 @@ PicnicView::on_load_complete()
 {
     uint32_t maxFiles = getMaxFiles();
     if (m_pictures.size() >= maxFiles) {
-        Glib::ustring msg = Glib::ustring::sprintf("Loading files reached the limit %d. If you are sure your system can handle more you can modify % and set the value %s.",
-                maxFiles, m_appSupport.getConfigName(), MAX_FILES);
+        Glib::ustring msg = Glib::ustring::sprintf("Loading files reached the limit %d. If you are sure your system can handle more you can modify in config and set the value %d.",
+                maxFiles, MAX_FILES);
         m_appSupport.showError(msg, Gtk::MESSAGE_WARNING);
     }
 }
@@ -388,8 +391,8 @@ PicnicView::on_file_dialog_response(int response_id, Gtk::FileChooserDialog* dia
         if (fPics->query_exists()) {
             clear();
             m_fileFinder->load(fPics);
-            Glib::KeyFile* config = m_appSupport.getConfig();
-            config->set_string(PicnicWindow::CONF_GROUP, CONF_PATH, filename);
+            auto config = m_appSupport.getConfig();
+            config->setString(PicnicWindow::CONF_GROUP, CONF_PATH, filename);
             m_appSupport.saveConfig();
         }
         break;

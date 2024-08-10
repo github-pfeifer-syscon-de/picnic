@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "PicnicListWin.hpp"
 #include "PicnicWindow.hpp"
 
 class PicnicApp : public Gtk::Application {

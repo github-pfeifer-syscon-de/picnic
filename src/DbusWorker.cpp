@@ -26,7 +26,6 @@
 #include "DbusWorker.hpp"
 #include "Pict.hpp"
 
-const char* DbusWorker::THUMBNAIL1_NAME = "org.freedesktop.thumbnails.Thumbnailer1";
 
 // as it looks event are delivered on the ui-thread
 
@@ -67,9 +66,9 @@ DbusWorker::getSchedulers(const Glib::RefPtr<Gio::AsyncResult> &result)
 {
     std::vector<Glib::ustring> scheds;
     proxy->GetSchedulers_finish(scheds, result);
-    //std::cout << "GetSchedulers_finish scheds: " << scheds.size() << std::endl;
+    psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("GetSchedulers_finish scheds: %d", scheds.size()));
     for (auto sched : scheds) {
-        //std::cout << "  sched " << sched << std::endl;
+        psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("  sched %s", sched));
         if (sched == "background") {  // this might have some issue
             m_scheduler = sched;
         }
@@ -88,10 +87,15 @@ DbusWorker::getSupported(const Glib::RefPtr<Gio::AsyncResult> &result)
     std::vector<Glib::ustring> uris;
     std::vector<Glib::ustring> mimes;
     proxy->GetSupported_finish(uris, mimes, result);
-    //std::cout << "GetSupported_finish uri: " << uris.size() << " mime: " << mimes.size() << std::endl;
+#   ifdef DBUS_WORKER_DEBUG
+    std::cout << "GetSupported_finish uri: " << uris.size() << " mime: " << mimes.size() << std::endl;
+#   endif
+    psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("GetSupported uri: %d mime: %d", uris.size(), mimes.size()));
     for (guint i = 0; i< uris.size(); ++i) {
         if (uris[i] == "file") {    //unsure how to handle resource,... ???
-            //std::cout << "uri[" << i << "] " << uris[i] << " " << mimes[i] << std::endl;
+#           ifdef DBUS_WORKER_DEBUG
+            std::cout << "uri[" << i << "] " << uris[i] << " " << mimes[i] << std::endl;
+#           endif
             m_mimes[mimes[i]] = uris[i];
         }
     }
@@ -104,16 +108,19 @@ DbusWorker::getFlavors(const Glib::RefPtr<Gio::AsyncResult> &result)
 {
     std::vector<Glib::ustring> flavors;
     proxy->GetFlavors_finish(flavors, result);
-    //std::cout << "GetFlavors_finish flavors: " << flavors.size() << std::endl;
+    psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("GetFlavors_finish flavors: %d", flavors.size() ));
     for (auto flv : flavors) {
         //std::cout << "  flavor " << flv << std::endl;
         if (flv == "large") {
             m_flavor = flv;
         }
     }
-    if (m_flavor.length() == 0) {
+    if (m_flavor.empty()) {
         m_flavor = "normal";    // normal shoud at least be supported
     }
+#   ifdef DBUS_WORKER_DEBUG
+    std::cout << "Using flavor uri: " << m_flavor << std::endl;
+#   endif
     m_flavorComplete = true;
     queue();
 }
@@ -124,20 +131,24 @@ DbusWorker::queue_ret(Glib::RefPtr<Gio::AsyncResult>& result)
 {
     guint32 ret;
     proxy->Queue_finish(ret, result);
-    //std::cout << "DbusWorker::queue_ret " << ret << std::endl;
+#   ifdef DBUS_WORKER_DEBUG
+    std::cout << "DbusWorker::queue_ret " << ret << std::endl;
+#   endif
     //queue();    // queue next if previous block was accepted, otherwise we wont get them all back
 }
 
 void
 DbusWorker::enqueue(const std::vector<Glib::ustring> &uris, const std::vector<Glib::ustring> &mimes)
 {
+#   ifdef DBUS_WORKER_DEBUG
+    std::cout << "DbusWorker::enqueue " << m_handle
+              << " cnt: " << uris.size()
+              << " flavor " << m_flavor
+              << " scheduler " << m_scheduler
+              << std::endl;
+#   endif
     if (uris.size() > 0) {
         proxy->Queue(uris, mimes, m_flavor, m_scheduler, m_handle, sigc::mem_fun(*this, &DbusWorker::queue_ret));
-        //std::cout << "DbusWorker::enqueue " << m_handle
-		//	      << " cnt: " << uris.size()
-		//	      << " flavor " << m_flavor
-		//	      << " scheduler " << m_scheduler
-		//	      << std::endl;
         ++m_handle;
     }
 }
@@ -145,10 +156,16 @@ DbusWorker::enqueue(const std::vector<Glib::ustring> &uris, const std::vector<Gl
 void
 DbusWorker::queue()
 {
-    //std::cout << "DbusWorker::queue try flav " << m_flavor
-    //          << " sched " << m_scheduler
-    //          << " mimes " << m_mimes.size()
-    //          <<  std::endl;
+#   ifdef DBUS_WORKER_DEBUG
+    std::cout << "DbusWorker::queue try flav " << m_flavor
+              << " sched " << m_scheduler
+              << " mimes " << m_mimes.size()
+              << " sched " << (m_scheduleComplete ? "y" : "n")
+              << " flav " << (m_flavorComplete ? "y" : "n")
+              << " mime " << (m_mimeComplete ? "y" : "n")
+              << " readyNotif " << (m_readyNotified ? "y" : "n")
+              <<  std::endl;
+#   endif
     if (!m_scheduleComplete
      || !m_flavorComplete
      || !m_mimeComplete) {    // start if all relevant infos are known
@@ -167,12 +184,15 @@ DbusWorker::queue()
             m_pictsQueue.pop_front();
             if (auto lpict = pict.lease()) {
                 std::string mime = lpict->getMime();
+#               ifdef DBUS_WORKER_DEBUG
+                std::cout << "DbusWorker::queue mime " << mime << " name " << lpict->getFileName() << " thumbnail " << (lpict->hasThumbnail() ? "y" : "n") << std::endl;
+#               endif
                 if (!lpict->hasThumbnail()
                   && !mime.empty()) {   // isMimeSupported shoud have been checked before
                     std::string uri = lpict->getUri();
-                    //std::cout << "DbusWorker::queue uri " << uri
-                    //	      << " mime " << mime
-                    //	      << std::endl;
+#                   ifdef DBUS_WORKER_DEBUG
+                    std::cout << "DbusWorker::queue uri " << uri << " mimes " << mimes.size() << std::endl;
+#                   endif
                     m_pictsInqueue.insert(std::pair(uri, pict));
                     uris.push_back(uri);
                     mimes.push_back(mime);
@@ -184,7 +204,9 @@ DbusWorker::queue()
         }
         if (!uris.empty()) {
             m_queue += uris.size();
-            //std::cout << "DbusWorker::queue " << m_queue << std::endl;
+#           ifdef DBUS_WORKER_DEBUG
+            std::cout << "DbusWorker::queue " << m_queue << std::endl;
+#           endif
         }
         enqueue(uris, mimes);
     }
@@ -193,7 +215,9 @@ DbusWorker::queue()
 void
 DbusWorker::on_finish(guint32 handle)
 {
-    //std::cout << "Finish " << handle << std::endl;
+#   ifdef DBUS_WORKER_DEBUG
+    std::cout << "Finish " << handle << std::endl;
+#   endif
     m_pictsInqueue.clear();     // for not blocking further handling
 	m_queueDispatcher.emit();
 }
@@ -204,9 +228,11 @@ DbusWorker::on_ready(guint32 handle, std::vector<Glib::ustring> ready)
     // handle is not the one we submitted, but increases on invocations
     std::lock_guard<std::mutex> lock(m_MutexBus);   // ensure we wont add new entries while working + m_pictsInqueue.empty ...
     m_ready += ready.size();
-    //std::cout << "Ready " << m_ready
-	//	      << " handle " << handle
-	//	      << std::endl;
+#   ifdef DBUS_WORKER_DEBUG
+    std::cout << "Ready " << m_ready
+		      << " handle " << handle
+		      << std::endl;
+#   endif
     for (auto rdy : ready) {
         //std::cout << "Ready[" << i << "] " << ready[i] << std::endl;
         auto p = m_pictsInqueue.find(rdy);
@@ -232,6 +258,11 @@ DbusWorker::getCache(Glib::ustring ready)
 
     std::string hash = getMd5Hash(ready);
     std::string thumbnail = Glib::build_filename(cache, "thumbnails", m_flavor, hash + ".png");
+#   ifdef DBUS_WORKER_DEBUG
+    std::cout << "DbusWorker::getCache cache " << cache
+		      << " hash " << hash
+              << " thumbnail " << thumbnail << std::endl;
+#   endif
 
     return Gio::File::create_for_path(thumbnail);
 }
@@ -239,9 +270,9 @@ DbusWorker::getCache(Glib::ustring ready)
 void
 DbusWorker::on_error(guint32 handle, std::vector<Glib::ustring> error, gint32 err, Glib::ustring msg)
 {
-    std::cout << "Error " << handle << " err " << err << " msg " << msg << std::endl;
+    psc::log::Log::logAdd(psc::log::Level::Error, Glib::ustring::sprintf("Error %d err %d msg %s",  handle, err, msg));
     for (auto err : error) {
-        std::cout << "Err  " << err << std::endl;
+        psc::log::Log::logAdd(psc::log::Level::Error, Glib::ustring::sprintf("Err  ", err));
     }
 }
 

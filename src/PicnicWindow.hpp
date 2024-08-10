@@ -22,6 +22,7 @@
 
 class PicnicApp;
 class PicnicView;
+class KeyConfig;
 
 class PicnicWindow : public Gtk::ApplicationWindow {
 public:
@@ -39,6 +40,7 @@ protected:
     void on_action_about();
 private:
     PicnicView *m_picnicView;
+    std::shared_ptr<KeyConfig> m_config;
     ApplicationSupport m_appSupport;
 
     static constexpr auto CONF_PREFIX{"win"};

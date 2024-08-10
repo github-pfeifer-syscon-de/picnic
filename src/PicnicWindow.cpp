@@ -17,6 +17,7 @@
 #include <iostream>
 #include <thread>
 #include <future>
+#include <KeyConfig.hpp>
 
 #include <gtkmm.h>
 
@@ -27,7 +28,8 @@
 
 PicnicWindow::PicnicWindow(PicnicApp *picnicApp)
 : Gtk::ApplicationWindow()
-, m_appSupport{"picnic.conf"}
+, m_config{std::make_shared<KeyConfig>("picnic.conf")}
+, m_appSupport{m_config}
 {
     auto pix = Gdk::Pixbuf::create_from_resource(picnicApp->get_resource_base_path() + "/picnic.png");
     if (pix) {
@@ -110,7 +112,7 @@ PicnicWindow::on_action_about()
             abtdlg->set_transient_for(*this);
             abtdlg->run();
             abtdlg->hide();
-        } 
+        }
 		else {
             std::cerr << "PicnicWindow::on_action_about(): No \"abt-dlg\" object in abt-dlg.ui"
                 << std::endl;

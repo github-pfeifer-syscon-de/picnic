@@ -27,7 +27,7 @@ Pict::Pict(const Glib::RefPtr<Gio::File> path, const Glib::ustring &name, const 
 , m_path{path}
 , m_name{name}
 , m_mime{mime}
-, m_tex{nullptr}
+, m_tex{}
 , m_pix()
 , m_state{State::CREATED}
 {
@@ -141,7 +141,7 @@ Pict::setPixbuf(Glib::RefPtr<Gdk::Pixbuf>& pix)
 bool
 Pict::hasThumbnail()
 {
-    if (m_tex != nullptr
+    if (m_tex
      || m_pix) {
         return true;
     }
@@ -157,7 +157,7 @@ Pict::setGray(const psc::gl::aptrTex2& gray)
 bool
 Pict::create(TextContext &pictContext)
 {
-    if (m_tex != nullptr
+    if (m_tex
      || !m_pix) {
         return false;
     }

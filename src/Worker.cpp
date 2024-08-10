@@ -16,6 +16,7 @@
  */
 
 #include <iostream>
+#include <Log.hpp>
 
 #include "Worker.hpp"
 #include "DbusWorker.hpp"
@@ -37,11 +38,11 @@ Worker::create(Glib::Dispatcher &_Dispatcher, Glib::Dispatcher &_readyDispatcher
 {
     // have to find system w/o thumbnailer to test this
     if (Gio::DBus::is_interface_name(DbusWorker::THUMBNAIL1_NAME)) {
-        //std::cout << "DbusWorker" << std::endl;
+        psc::log::Log::logAdd(psc::log::Level::Info, "DbusWorker");
         return new DbusWorker(_Dispatcher, _readyDispatcher);
     }
     else {
-        //std::cout << "ThreadWorker" << std::endl;
+        psc::log::Log::logAdd(psc::log::Level::Info, "ThreadWorker");
         return new ThreadWorker(_Dispatcher, _readyDispatcher);
 	}
 }
