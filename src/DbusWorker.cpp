@@ -22,6 +22,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <Log.hpp>
+#include <StringUtils.hpp>
 
 #include "DbusWorker.hpp"
 #include "Pict.hpp"
@@ -66,9 +67,9 @@ DbusWorker::getSchedulers(const Glib::RefPtr<Gio::AsyncResult> &result)
 {
     std::vector<Glib::ustring> scheds;
     proxy->GetSchedulers_finish(scheds, result);
-    psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("GetSchedulers_finish scheds: %d", scheds.size()));
+    psc::log::Log::logAdd(psc::log::Level::Info, std::format("GetSchedulers_finish scheds: {0}", scheds.size()));
     for (auto sched : scheds) {
-        psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("  sched %s", sched));
+        psc::log::Log::logAdd(psc::log::Level::Info, std::format("  sched {0}", sched));
         if (sched == "background") {  // this might have some issue
             m_scheduler = sched;
         }
@@ -90,7 +91,7 @@ DbusWorker::getSupported(const Glib::RefPtr<Gio::AsyncResult> &result)
 #   ifdef DBUS_WORKER_DEBUG
     std::cout << "GetSupported_finish uri: " << uris.size() << " mime: " << mimes.size() << std::endl;
 #   endif
-    psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("GetSupported uri: %d mime: %d", uris.size(), mimes.size()));
+    psc::log::Log::logAdd(psc::log::Level::Info, std::format("GetSupported uri's: {0} mime's: {1}", uris.size(), mimes.size()));
     for (guint i = 0; i< uris.size(); ++i) {
         if (uris[i] == "file") {    //unsure how to handle resource,... ???
 #           ifdef DBUS_WORKER_DEBUG
@@ -108,7 +109,7 @@ DbusWorker::getFlavors(const Glib::RefPtr<Gio::AsyncResult> &result)
 {
     std::vector<Glib::ustring> flavors;
     proxy->GetFlavors_finish(flavors, result);
-    psc::log::Log::logAdd(psc::log::Level::Info, Glib::ustring::sprintf("GetFlavors_finish flavors: %d", flavors.size() ));
+    psc::log::Log::logAdd(psc::log::Level::Info, std::format("GetFlavors_finish flavors: {0}", flavors.size() ));
     for (auto flv : flavors) {
         //std::cout << "  flavor " << flv << std::endl;
         if (flv == "large") {
@@ -270,9 +271,9 @@ DbusWorker::getCache(Glib::ustring ready)
 void
 DbusWorker::on_error(guint32 handle, std::vector<Glib::ustring> error, gint32 err, Glib::ustring msg)
 {
-    psc::log::Log::logAdd(psc::log::Level::Error, Glib::ustring::sprintf("Error %d err %d msg %s",  handle, err, msg));
+    psc::log::Log::logAdd(psc::log::Level::Error, std::format("Error {0} err {1} msg {2}",  handle, err, msg));
     for (auto err : error) {
-        psc::log::Log::logAdd(psc::log::Level::Error, Glib::ustring::sprintf("Err  ", err));
+        psc::log::Log::logAdd(psc::log::Level::Error, std::format("Err msg:  ", err));
     }
 }
 
@@ -333,7 +334,7 @@ void
 DbusWorker::setThumbnail(const psc::mem::active_ptr<Pict>& pict, Glib::RefPtr<Gio::File> thumbnail)
 {
     // try to offload the costly file access from dbus event handling
-    psc::log::Log::logAdd(psc::log::Level::Debug, Glib::ustring::sprintf("DbusWorker::setThumbnail path %s", thumbnail->get_path()));
+    psc::log::Log::logAdd(psc::log::Level::Debug, std::format(" path {0}", thumbnail->get_path()));
     if (auto lpict = pict.lease()) {
         lpict->setThumbnail(thumbnail);
         if (!m_thumbnailReader.valid()) {
