@@ -136,7 +136,7 @@ PicnicView::init_shaders(Glib::Error &error)
         error = err;
         ret = false;
     }
-    m_log->info(std::format("init_shaders {0}", (ret ? "ok" : "fail")));
+    m_log->info(Glib::ustring::sprintf("PicnicView::init_shaders %s", (ret ? "ok" : "fail")));
     return ret;
 }
 
@@ -237,7 +237,7 @@ PicnicView::add_file(const std::string& mime, Glib::RefPtr<Gio::FileInfo>& fileI
 		m_worker->queue(pict);
 	}
 	else {
-        m_log->warn(std::format("rejected mime {0} for {1}", mime, file->get_basename()));
+        m_log->warn(Glib::ustring::sprintf("rejected mime %s for %s", mime, file->get_basename()));
 	}
     uint32_t maxFiles = getMaxFiles();
 	return m_pictures.size() < maxFiles;
@@ -268,7 +268,7 @@ PicnicView::loadDispatcherEmit()
 	m_layout->position(true, m_glArea->get_width(), m_glArea->get_height());     // position incrementally, even if retrival is faster than our screen at least for a limited number
 	// need if icons shoud be used on_notification_from_worker_thread();
 	m_glArea->queue_draw();
-	m_log->info(std::format("Files {0}", m_pictures.size() ));
+	m_log->info(Glib::ustring::sprintf("Files %d", m_pictures.size() ));
     m_loadDispatcher.emit();
 }
 
@@ -277,7 +277,7 @@ PicnicView::on_load_complete()
 {
     uint32_t maxFiles = getMaxFiles();
     if (m_pictures.size() >= maxFiles) {
-        Glib::ustring msg = std::format("Found files {0} reached the limit  {1}. If you are sure your system can handle more you can modify in config.",
+        Glib::ustring msg = Glib::ustring::sprintf("Loading files reached the limit %d. If you are sure your system can handle more you can modify in config and set the value %d.",
                 maxFiles, MAX_FILES);
         m_appSupport.showError(msg, Gtk::MESSAGE_WARNING);
     }
@@ -422,7 +422,7 @@ PicnicView::on_action_view()
             picts.push_back(lpict->getPath());
         }
         else {
-        	m_log->error(std::format("Failed to cast tile to pict {0}", typeid(tile).name()));
+        	m_log->error(Glib::ustring::sprintf("Failed to cast tile to pict %s", typeid(tile).name()));
         }
     }
 	ImageView<Gtk::Window,GtkWindow>::showView(front, picts, m_appSupport);
