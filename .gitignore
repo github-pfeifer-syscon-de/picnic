@@ -31,7 +31,6 @@
 *.out
 *.app
 /res/Makefile
-/res/picnic.desktop
 /res/Makefile.in
 /PKGBUILD
 /Makefile

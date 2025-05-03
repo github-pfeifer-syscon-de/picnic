@@ -16,18 +16,15 @@ $(PICNIC_RESOURCE_C): $(PICNIC_RESOURCE_XML) $(PICNIC_RESOURCES)
 
 # The desktop files
 desktopdir=$(datadir)/applications
-desktop_in_files=picnic.desktop.in
-desktop_DATA=$(desktop_in_files:.desktop.in=.desktop)
+desktop_DATA=picnic.desktop
 
 
 # application icon
-appicondir=$(datadir)/icons/hicolor/64x64/apps
-appicon_DATA=picnic.png
-appdir_icon=$(appicondir)/$(appicon_DATA)
+icon_basename=picnic
+pixmapdir=$(datadir)/icons/hicolor/64x64/apps
+pixmap_DATA=$(icon_basename).png
+appicondir=$(datadir)/icons/hicolor/scalable/apps
+appicon_DATA=$(icon_basename).svg
 
-EXTRA_DIST=$(PICNIC_RESOURCES) $(PICNIC_RESOURCE_XML) $(desktop_in_files) $(appicon_DATA)
+EXTRA_DIST=$(PICNIC_RESOURCES) $(PICNIC_RESOURCE_XML) $(desktop_DATA) $(pixmap_DATA) $(appicon_DATA)
 
-DISTCLEANFILES=$(desktop_DATA)
-
-%.desktop: %.desktop.in
-	@regex_cmd@ -e "s,\@APP_ICON\@,$(appdir_icon),g" $? > $@

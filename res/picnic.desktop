@@ -6,4 +6,4 @@ Name=Picnic
 Comment=Fancy image viewer
 Categories=Application;Graphics;
 Exec=picnic %F
-Icon=@APP_ICON@
+Icon=picnic

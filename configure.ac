@@ -39,8 +39,6 @@ else
     PKG_CHECK_MODULES(EPOXY,[epoxy])
 fi
 
-AX_CHECK_SED()
-
 AC_CONFIG_FILES([
 Makefile
 src/Makefile
