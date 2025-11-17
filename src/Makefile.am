@@ -11,24 +11,14 @@ AM_CPPFLAGS = \
 	$(OPENSSL_CFLAGS)
 
 
-AM_CFLAGS=
+AM_CFLAGS= -Wall
 
-# \ -Wall
-
-AM_CXXFLAGS =
-
-# \ -Wall
+AM_CXXFLAGS = -Wall
 
 bin_PROGRAMS = picnic
 
 picnic_SOURCES = \
 	resources.c \
-	thumbnail1_common.h \
-	thumbnail1_common.cpp \
-	thumbnail1_proxy.h \
-	thumbnail1_proxy.cpp \
-	thumbnail1_stub.h \
-	thumbnail1_stub.cpp \
 	Worker.cpp \
 	Worker.hpp \
 	DbusWorker.cpp \
@@ -70,7 +60,8 @@ picnic_SOURCES = \
 
 picnic_LDFLAGS =
 
-picnic_LDADD = $(GENERICGLM_LIBS) \
+picnic_LDADD = ../gen/libthumbnail1.a \
+	$(GENERICGLM_LIBS) \
 	$(GENERICIMG_LIBS) \
 	$(GTHREAD_LIBS) \
 	$(EPOXY_LIBS) \

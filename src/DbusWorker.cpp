@@ -46,13 +46,14 @@ DbusWorker::DbusWorker(Glib::Dispatcher &_Dispatcher, Glib::Dispatcher &_readyDi
 {
     m_queueDispatcher.connect(sigc::mem_fun(*this, &DbusWorker::on_queue_check));
 
-    org::freedesktop::thumbnails::Thumbnailer1::createForBus(
+    org::freedesktop::thumbnails::Thumbnailer1Proxy::createForBus(
                                 Gio::DBus::BUS_TYPE_SESSION,
                                 Gio::DBus::PROXY_FLAGS_NONE,
                                 THUMBNAIL1_NAME,
                                 "/org/freedesktop/thumbnails/Thumbnailer1",
                                 sigc::mem_fun(*this, &DbusWorker::proxy_created));
-
+// see https://stackoverflow.com/questions/14263390/how-to-compile-a-basic-d-bus-glib-example
+//    for alternative
 }
 
 
@@ -279,7 +280,7 @@ DbusWorker::on_error(guint32 handle, std::vector<Glib::ustring> error, gint32 er
 void
 DbusWorker::proxy_created(const Glib::RefPtr<Gio::AsyncResult> result)
 {
-    proxy = org::freedesktop::thumbnails::Thumbnailer1::createForBusFinish(result);
+    proxy = org::freedesktop::thumbnails::Thumbnailer1Proxy::createForBusFinish(result);
 
     proxy->Finished_signal.connect(sigc::mem_fun(*this, &DbusWorker::on_finish));
     proxy->Ready_signal.connect(sigc::mem_fun(*this, &DbusWorker::on_ready));
@@ -315,7 +316,7 @@ DbusWorker::getMd5Hash(const Glib::ustring &uri)
     EVP_MD_CTX *ctx = EVP_MD_CTX_create();
     EVP_MD_CTX_init(ctx);
     EVP_DigestInit_ex(ctx, mdType, nullptr);
-    unsigned int dataLen = strlen(uri.c_str());
+    auto dataLen = strlen(uri.c_str());
     EVP_DigestUpdate(ctx, uri.c_str(), dataLen);
     EVP_DigestFinal_ex(ctx, md, nullptr);
     EVP_MD_CTX_destroy(ctx);

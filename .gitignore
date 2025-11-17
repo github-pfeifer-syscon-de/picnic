@@ -68,3 +68,15 @@
 /src/.deps/PicnicView.Tpo
 /src/.deps/PicnicListWin.Tpo
 /src/.deps/PicnicApp.Tpo
+/test/test-suite.log
+/test/Makefile.in
+/test/bus_test.log
+/test/Makefile
+/test/bus_test.trs
+/test/bus_test
+/test/.deps/
+/test/.libs/
+/test-driver
+/gen/Makefile
+/gen/Makefile.in
+/gen/.deps/

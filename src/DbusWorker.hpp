@@ -26,7 +26,7 @@
 #include <ConcurrentCollections.hpp>
 
 #include "Worker.hpp"
-#include "thumbnail1_proxy.h"
+#include "../gen/thumbnail1_proxy.h"
 #include "Pict.hpp"
 
 #undef DBUS_WORKER_DEBUG
@@ -58,7 +58,7 @@ private:
     void readThumbnails();
     void setThumbnail(const psc::mem::active_ptr<Pict>& pict, Glib::RefPtr<Gio::File> thumbnail);
 
-    Glib::RefPtr<org::freedesktop::thumbnails::Thumbnailer1> proxy;
+    Glib::RefPtr<org::freedesktop::thumbnails::Thumbnailer1Proxy> proxy;
     std::list<psc::mem::active_ptr<Pict>> m_pictsQueue;      // pics queued list  (using queue woud be a bad idea)
     std::map<std::string, psc::mem::active_ptr<Pict>> m_pictsInqueue;   // pics momentary in dbus processing
     guint32 m_handle;

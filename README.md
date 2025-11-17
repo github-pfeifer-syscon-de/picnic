@@ -19,14 +19,30 @@ configure:<br>
 </pre>
 
 Developer info:
+
+   to regenerate the interface if you feel this may be needed
+    the following might be helpful:
+
+    As the interface appears to be stable (and requires the install of some  utilities)
+    the generated sources have been included see ./gen
+
+    The process of rengenerate the .xml requires:
 <pre>
-   to regenerate the interface the following might be helpful:
-     this is somewhat incomplete as this wasn't simple on the first try, and i still have some difficulties to reproduce this
-       thumbnail1.xml can be create with dfeet by calling introspection.
-	the generated code needs manual tuning e.g. add private message member and closing brace, remove path for imports
-	clone https://github.com/Pelagicore/gdbus-codegen-glibmm
-        ensure the python dependencies are available e.g. python-setuptools, python-j2cli
-        use "python setup.py install --record egg-files.txt"
-        this allows unsinstall with "cat egg-files.txt | rm -rf"
-	gdbus-codegen-glibmm3 --generate-cpp-code=thumbnail1 thumbnail1.xml
+    gdbus
 </pre>
+    which comes with the glib package (at least for my system).
+
+    The cpp sources are build with:
+<pre>
+    gdbus-codegen-glibmm3
+</pre>
+    which seems to be not part of a distribution.
+    So you have to clone https://github.com/Pelagicore/gdbus-codegen-glibmm
+    ensure the python dependencies are available e.g. python-setuptools, ...
+    As root use:
+<pre>
+    python3 setup.py install --record egg-files.txt
+</pre>
+    this allows a uninstall with "cat egg-files.txt | rm -rf"
+
+    As the dependency tracking is

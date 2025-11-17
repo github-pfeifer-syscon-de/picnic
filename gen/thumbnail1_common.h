@@ -1,9 +1,12 @@
 #pragma once
 #include <iostream>
-#include <map>
-#include <tuple>
+#include <vector>
 #include "glibmm.h"
 #include "giomm.h"
+
+namespace org {
+namespace freedesktop {
+namespace DBus {
 
 class PropertiesTypeWrap {
 public:
@@ -57,50 +60,36 @@ public:
             Glib::Variant<Glib::ustring>::create(arg_interface_name);
         return Glib::VariantContainerBase::create_tuple(params);
     }
+
+    static Glib::VariantContainerBase Set_pack(
+        const Glib::ustring & arg_interface_name,
+        const Glib::ustring & arg_property_name,
+        const Glib::VariantBase & arg_value) {
+        Glib::VariantContainerBase base;
+        std::vector<Glib::VariantBase> params;
+
+        Glib::Variant<Glib::ustring> interface_name_param =
+            Glib::Variant<Glib::ustring>::create(arg_interface_name);
+        params.push_back(interface_name_param);
+
+        Glib::Variant<Glib::ustring> property_name_param =
+            Glib::Variant<Glib::ustring>::create(arg_property_name);
+        params.push_back(property_name_param);
+
+        Glib::Variant<Glib::VariantBase> value_param =
+            Glib::Variant<Glib::VariantBase>::create(arg_value);
+        params.push_back(value_param);
+        return Glib::VariantContainerBase::create_tuple(params);
+    }
 };
 
-class PropertiesMessageHelper {
-public:
-    PropertiesMessageHelper (const Glib::RefPtr<Gio::DBus::MethodInvocation> msg):
-        m_message(msg) {}
+} // DBus
+} // freedesktop
+} // org
 
-    const Glib::RefPtr<Gio::DBus::MethodInvocation> getMessage() {
-        return m_message;
-    }
-
-    void ret(Glib::Error error) {
-        m_message->return_error(error);
-    }
-
-    void returnError(const Glib::ustring &domain, int code, const Glib::ustring &message) {
-        m_message->return_error(domain, code, message);
-    }
-
-    void ret(const Glib::VariantBase & p0) {
-        std::vector<Glib::VariantBase> vlist;
-        vlist.push_back(p0);
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-    void ret(const std::map<Glib::ustring,Glib::VariantBase> & p0) {
-        std::vector<Glib::VariantBase> vlist;
-        Glib::Variant<std::map<Glib::ustring,Glib::VariantBase>> var0 =
-            Glib::Variant<std::map<Glib::ustring,Glib::VariantBase>>::create(p0);
-        vlist.push_back(var0);
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-    void ret() {
-        std::vector<Glib::VariantBase> vlist;
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-private:
-    Glib::RefPtr<Gio::DBus::MethodInvocation> m_message;
-};
+namespace org {
+namespace freedesktop {
+namespace DBus {
 
 class IntrospectableTypeWrap {
 public:
@@ -132,35 +121,13 @@ public:
     }
 };
 
-class IntrospectableMessageHelper {
-public:
-    IntrospectableMessageHelper (const Glib::RefPtr<Gio::DBus::MethodInvocation> msg):
-        m_message(msg) {}
+} // DBus
+} // freedesktop
+} // org
 
-    const Glib::RefPtr<Gio::DBus::MethodInvocation> getMessage() {
-        return m_message;
-    }
-
-    void ret(Glib::Error error) {
-        m_message->return_error(error);
-    }
-
-    void returnError(const Glib::ustring &domain, int code, const Glib::ustring &message) {
-        m_message->return_error(domain, code, message);
-    }
-
-    void ret(const Glib::ustring & p0) {
-        std::vector<Glib::VariantBase> vlist;
-        Glib::Variant<Glib::ustring> var0 =
-            Glib::Variant<Glib::ustring>::create(p0);
-        vlist.push_back(var0);
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-private:
-    Glib::RefPtr<Gio::DBus::MethodInvocation> m_message;
-};
+namespace org {
+namespace freedesktop {
+namespace DBus {
 
 class PeerTypeWrap {
 public:
@@ -192,41 +159,13 @@ public:
     }
 };
 
-class PeerMessageHelper {
-public:
-    PeerMessageHelper (const Glib::RefPtr<Gio::DBus::MethodInvocation> msg):
-        m_message(msg) {}
+} // DBus
+} // freedesktop
+} // org
 
-    const Glib::RefPtr<Gio::DBus::MethodInvocation> getMessage() {
-        return m_message;
-    }
-
-    void ret(Glib::Error error) {
-        m_message->return_error(error);
-    }
-
-    void returnError(const Glib::ustring &domain, int code, const Glib::ustring &message) {
-        m_message->return_error(domain, code, message);
-    }
-
-    void ret() {
-        std::vector<Glib::VariantBase> vlist;
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-    void ret(const Glib::ustring & p0) {
-        std::vector<Glib::VariantBase> vlist;
-        Glib::Variant<Glib::ustring> var0 =
-            Glib::Variant<Glib::ustring>::create(p0);
-        vlist.push_back(var0);
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-private:
-    Glib::RefPtr<Gio::DBus::MethodInvocation> m_message;
-};
+namespace org {
+namespace freedesktop {
+namespace thumbnails {
 
 class Thumbnailer1TypeWrap {
 public:
@@ -297,60 +236,8 @@ public:
     }
 };
 
-class Thumbnailer1MessageHelper {
-public:
-    Thumbnailer1MessageHelper (const Glib::RefPtr<Gio::DBus::MethodInvocation> msg):
-        m_message(msg) {}
+} // thumbnails
+} // freedesktop
+} // org
 
-    const Glib::RefPtr<Gio::DBus::MethodInvocation> getMessage() {
-        return m_message;
-    }
-
-    void ret(Glib::Error error) {
-        m_message->return_error(error);
-    }
-
-    void returnError(const Glib::ustring &domain, int code, const Glib::ustring &message) {
-        m_message->return_error(domain, code, message);
-    }
-
-    void ret(guint32 p0) {
-        std::vector<Glib::VariantBase> vlist;
-        Glib::Variant<guint32> var0 =
-            Glib::Variant<guint32>::create(p0);
-        vlist.push_back(var0);
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-    void ret() {
-        std::vector<Glib::VariantBase> vlist;
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-    void ret(const std::vector<Glib::ustring> & p0, const std::vector<Glib::ustring> & p1) {
-        std::vector<Glib::VariantBase> vlist;
-        Glib::Variant<std::vector<Glib::ustring>> var0 =
-            Glib::Variant<std::vector<Glib::ustring>>::create(p0);
-        vlist.push_back(var0);
-        Glib::Variant<std::vector<Glib::ustring>> var1 =
-            Glib::Variant<std::vector<Glib::ustring>>::create(p1);
-        vlist.push_back(var1);
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-    void ret(const std::vector<Glib::ustring> & p0) {
-        std::vector<Glib::VariantBase> vlist;
-        Glib::Variant<std::vector<Glib::ustring>> var0 =
-            Glib::Variant<std::vector<Glib::ustring>>::create(p0);
-        vlist.push_back(var0);
-
-        m_message->return_value(Glib::Variant<Glib::VariantBase>::create_tuple(vlist));
-    }
-
-private:
-    Glib::RefPtr<Gio::DBus::MethodInvocation> m_message;
-};
 

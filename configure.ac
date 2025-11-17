@@ -25,7 +25,8 @@ PKG_CHECK_MODULES([GENERICGLM], [genericglm >= 0.3.1])
 PKG_CHECK_MODULES([GENERICIMG], [genericimg >= 0.3.3])
 
 dnl dont repeat dependencies
-dnl PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4])
+PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4 giomm-2.4])
+PKG_CHECK_MODULES([DBUS], [dbus-1 dbus-glib-1])
 dnl PKG_CHECK_MODULES([GTKMM], [gtkmm-3.0])
 
 PKG_CHECK_MODULES([OPENSSL], [openssl])
@@ -41,7 +42,9 @@ fi
 
 AC_CONFIG_FILES([
 Makefile
-src/Makefile
 res/Makefile
+gen/Makefile
+src/Makefile
+test/Makefile
 ])
 AC_OUTPUT
