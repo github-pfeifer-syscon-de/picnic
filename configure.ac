@@ -6,7 +6,7 @@ AC_INIT([picnic],[0.1],[picnic@pfeifer-syscon.de])
 
 AC_CONFIG_HEADERS([config.h])
 
-AM_INIT_AUTOMAKE([1.11])
+AM_INIT_AUTOMAKE([1.11] foreign)
 
 AM_SILENT_RULES([yes])
 
