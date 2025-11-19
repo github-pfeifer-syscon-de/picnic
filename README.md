@@ -43,6 +43,5 @@ Developer info:
 <pre>
     python3 setup.py install --record egg-files.txt
 </pre>
-    this allows a uninstall with "cat egg-files.txt | rm -rf"
-
-    As the dependency tracking is
+    this allows a uninstall with "cat egg-files.txt | rm -rf".
+    The rest will be handled with make.
