@@ -33,8 +33,9 @@ As root use:
 <pre>
     python3 setup.py install --record egg-files.txt
 </pre>
-    this allows a uninstall with
+
+This allows a uninstall with:
 <pre>
   cat egg-files.txt | rm -rf
 </pre>
-    The rest will be handled with make.
+The rest will be handled with make.
