@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_INIT([picnic],[0.1],[picnic@pfeifer-syscon.de])
+AC_INIT([picnic],[0.1])
 
 AC_CONFIG_HEADERS([config.h])
 
