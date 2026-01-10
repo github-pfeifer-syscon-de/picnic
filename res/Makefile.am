@@ -2,15 +2,15 @@
 PKGCONFIG=pkgconf
 GLIB_COMPILE_RESOURCES=$(shell $(PKGCONFIG) --variable=glib_compile_resources gio-2.0)
 
-PICNIC_RESOURCE_XML=picnic.gresource.xml
-PICNIC_RESOURCES=$(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=. --generate-dependencies $(PICNIC_RESOURCE_XML))
-PICNIC_RESOURCE_C=../src/resources.c
+PICNIC_RESOURCE_XML=$(srcdir)/picnic.gresource.xml
+PICNIC_RESOURCES=$(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(srcdir) --generate-dependencies $(PICNIC_RESOURCE_XML))
+PICNIC_RESOURCE_C=$(top_srcdir)/src/resources.c
 
 
 all:$(PICNIC_RESOURCE_C)
 
 $(PICNIC_RESOURCE_C): $(PICNIC_RESOURCE_XML) $(PICNIC_RESOURCES)
-	$(GLIB_COMPILE_RESOURCES) --target=$(PICNIC_RESOURCE_C) --sourcedir=. --generate-source $(PICNIC_RESOURCE_XML)
+	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(dir $<) --generate-source $<
 
 
 
