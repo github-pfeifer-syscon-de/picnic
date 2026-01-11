@@ -1,6 +1,6 @@
 static const char interfaceXml0[] = R"XML_DELIMITER(<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
                       "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
-<!-- GDBus 2.86.1 -->
+<!-- GDBus 2.86.3 -->
 <node>
   <interface name="org.freedesktop.DBus.Properties">
     <method name="Get">

@@ -12,7 +12,7 @@ AM_CPPFLAGS = \
 	$(GENERICIMG_CFLAGS)
 
 PICNIC_INTF_PREFIX=thumbnail1
-PICNIC_INTF_XML=$(PICNIC_INTF_PREFIX).xml
+PICNIC_INTF_XML=$(srcdir)/$(PICNIC_INTF_PREFIX).xml
 DBUS_INTF_NAME=org.freedesktop.thumbnails.Thumbnailer1
 DBUS_INTF_PATH=/org/freedesktop/thumbnails/Thumbnailer1
 
@@ -34,4 +34,4 @@ $(PICNIC_INTF_XML):
 
 # howto get gdbus-codegen-glibmm3 see README.md
 $(PICNIC_INTF_PREFIX)_common.cpp: $(PICNIC_INTF_XML)
-	$(shell gdbus-codegen-glibmm3 --generate-cpp-code=$(PICNIC_INTF_PREFIX) $(PICNIC_INTF_XML))
+	$(shell cd $(srcdir); gdbus-codegen-glibmm3 --generate-cpp-code=$(PICNIC_INTF_PREFIX) $(PICNIC_INTF_PREFIX).xml)
