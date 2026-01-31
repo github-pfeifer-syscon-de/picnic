@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+bin_PROGRAMS = picnic
+
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)."\" \
@@ -10,12 +12,18 @@ AM_CPPFLAGS = \
 	$(EPOXY_CFLAGS) \
 	$(OPENSSL_CFLAGS)
 
+picnic_LDFLAGS = 
 
-AM_CFLAGS= -Wall
+picnic_CFLAGS = $(WARN_CFLAGS)
+picnic_CXXFLAGS = $(WARN_CXXFLAGS)
 
-AM_CXXFLAGS = -Wall
+if RELEASE
+picnic_CXXFLAGS += $(OPTIM_CXXFLAGS)
+else
+picnic_CXXFLAGS += $(INSTUMENT_CXXFLAGS)
+picnic_LDFLAGS += $(INSTUMENT_LINKFLAGS)
+endif
 
-bin_PROGRAMS = picnic
 
 picnic_SOURCES = \
 	resources.c \
@@ -55,10 +63,6 @@ picnic_SOURCES = \
 	FileFinder.hpp \
 	CubeLayout.cpp \
 	CubeLayout.hpp
-
-
-
-picnic_LDFLAGS =
 
 picnic_LDADD = ../gen/libthumbnail1.a \
 	$(GENERICGLM_LIBS) \

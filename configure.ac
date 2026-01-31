@@ -11,6 +11,7 @@ AM_INIT_AUTOMAKE([1.11] foreign)
 AM_SILENT_RULES([yes])
 
 AX_CHECK_ENABLE_DEBUG([info], [DEBUG], [RELEASE], [IS-RELEASE])
+AM_CONDITIONAL([RELEASE],[test "x${enable_debug}" != "xyes"])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX([20], [noext], [optional])
 
