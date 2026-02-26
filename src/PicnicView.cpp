@@ -36,7 +36,7 @@
 #include "ImageView.hpp"
 #include "PicnicWindow.hpp"
 #include "FileFinder.hpp"
-#include "config.h"
+#include "picnic_config.h"
 
 Gray::Gray(uint32_t width, uint32_t height)
 : psc::gl::Tex2()
