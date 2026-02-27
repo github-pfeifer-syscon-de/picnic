@@ -80,3 +80,6 @@
 /gen/Makefile
 /gen/Makefile.in
 /gen/.deps/
+/.idea/misc.xml
+/.idea/vcs.xml
+/.idea/.gitignore

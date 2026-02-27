@@ -22,12 +22,16 @@ Developer info:
 
 to regenerate the interface if you feel this may be needed the following might be helpful:
 
-As the interface appears to be stable (and requires the install of some  utilities) the generated sources have been included see ./gen
+As the interface appears to be stable (and requires the install of some  utilities)
+the generated sources have been included see <pre>gen</pre> directory.
 
-The process of rengenerate the .xml Interface description requires: `gdbus` which comes with the glib package (at least for my system).
+The process of rengenerate the .xml Interface description
+requires: `gdbus` which comes with the glib package (at least for my system).
 
-The cpp sources are build with: `gdbus-codegen-glibmm3` which seems to be not part of a distribution.
-So you have to clone https://github.com/Pelagicore/gdbus-codegen-glibmm ensure the python dependencies are available e.g. python-setuptools, ...
+The cpp sources are build with: `gdbus-codegen-glibmm3`
+which seems to be not part of a distribution.
+So you have to clone https://github.com/Pelagicore/gdbus-codegen-glibmm
+ensure the python requirements are meet e.g. python-setuptools, ...
 
 As root use:
 <pre>
@@ -38,4 +42,4 @@ This allows a uninstall with:
 <pre>
   cat egg-files.txt | rm -rf
 </pre>
-The rest will be handled with make.
+The rest will be handled with gen/meson.build (see comments).

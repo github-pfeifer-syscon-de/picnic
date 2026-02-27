@@ -1,1 +1,5 @@
 RolandPf67@googlemail.com
+
+The gen part is based on the thumbnail dbus service,
+the Glibmm interface was generated with gdbus-codegen-glibmm3
+see Readme.md for more details.
